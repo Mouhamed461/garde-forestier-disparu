@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+// Fichier principal — routing entre toutes les pages
+import React from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+import Accueil from './pages/Accueil'
+import Lobby from './pages/Lobby'
+import Video from './pages/Video'
+import Choix from './pages/Choix'
+import Resultats from './pages/Resultats'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <BrowserRouter>
+      <Routes>
+        {/* Page d'accueil */}
+        <Route path="/" element={<Accueil />} />
+
+        {/* Salle d'attente */}
+        <Route path="/lobby" element={<Lobby />} />
+
+        {/* Lecteur vidéo */}
+        <Route path="/video" element={<Video />} />
+
+        {/* Écran de choix */}
+        <Route path="/choix" element={<Choix />} />
+
+        {/* Résultats finaux */}
+        <Route path="/resultats" element={<Resultats />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
