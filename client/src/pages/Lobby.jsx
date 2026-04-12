@@ -1,22 +1,105 @@
-// Page de salle d'attente — affiche les joueurs connectés
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import socket from '../socket'
+import './Lobby.css'
 
 function Lobby() {
+  const { state } = useLocation()
+  const navigate = useNavigate()
+
+  const { code, nom, isHote, joueursInitiaux } = state || {}
+
+  const [joueurs, setJoueurs] = useState(joueursInitiaux || [])
+  const [estPret, setEstPret] = useState(false)
+
+  // Rediriger vers l'accueil si on arrive ici sans données (ex: refresh)
+  useEffect(() => {
+    if (!code) navigate('/', { replace: true })
+  }, [code, navigate])
+
+  useEffect(() => {
+    // Recevoir les mises à jour de la liste de joueurs
+    socket.on('liste-joueurs', (liste) => {
+      setJoueurs(liste)
+    })
+
+    // L'hôte a lancé la session → tout le monde va à la page vidéo
+    socket.on('session-lancee', () => {
+      navigate('/video', { state: { code, nom, isHote } })
+    })
+
+    return () => {
+      socket.off('liste-joueurs')
+      socket.off('session-lancee')
+    }
+  }, [code, nom, isHote, navigate])
+
+  function marquerPret() {
+    setEstPret(true)
+    socket.emit('joueur-pret', code)
+  }
+
+  function lancerSession() {
+    socket.emit('lancer-session', code)
+  }
+
+  const tousPretsCount = joueurs.filter(j => j.pret).length
+  const tousPretsRatio = joueurs.length > 0 ? Math.round((tousPretsCount / joueurs.length) * 100) : 0
+
   return (
-    <div className="page">
-      <h1>Salle d'attente</h1>
+    <div className="lobby">
+      <div className="lobby-haut">
+        <p className="lobby-surtitre">Salle d'attente</p>
+        <div className="lobby-code">
+          <span className="code-label">Code de session</span>
+          <span className="code-valeur">{code}</span>
+          <span className="code-hint">Partage ce code avec tes amis</span>
+        </div>
+      </div>
 
-      {/* Code de session affiché pour l'hôte */}
-      <p>Code de session : XXXXX</p>
+      <div className="lobby-joueurs">
+        <p className="joueurs-titre">Joueurs connectés — {joueurs.length}</p>
+        <ul className="joueurs-liste">
+          {joueurs.map((j) => (
+            <li key={j.id} className={`joueur-item ${j.pret ? 'pret' : ''}`}>
+              <span className="joueur-nom">
+                {j.nom}
+                {j.id === socket.id && <span className="joueur-moi"> (toi)</span>}
+              </span>
+              <span className="joueur-statut">
+                {j.pret ? '✓ Prêt' : 'En attente…'}
+              </span>
+            </li>
+          ))}
+        </ul>
 
-      {/* Liste des joueurs — placeholder pour l'instant */}
-      <ul>
-        <li>Joueur 1 — En attente</li>
-        <li>Joueur 2 — En attente</li>
-      </ul>
+        <div className="pret-barre-fond">
+          <div className="pret-barre-remplie" style={{ width: tousPretsRatio + '%' }} />
+        </div>
+        <p className="pret-compteur">{tousPretsCount}/{joueurs.length} prêts</p>
+      </div>
 
-      {/* Bouton de lancement — visible pour l'hôte seulement */}
-      <button>Lancer l'expérience</button>
+      <div className="lobby-actions">
+        {!isHote && !estPret && (
+          <button className="btn-pret" onClick={marquerPret}>
+            Je suis prêt
+          </button>
+        )}
+        {!isHote && estPret && (
+          <p className="attente-hote">En attente de l'hôte…</p>
+        )}
+        {isHote && (
+          <button
+            className="btn-lancer"
+            onClick={lancerSession}
+            disabled={joueurs.length < 1}
+          >
+            {joueurs.length < 1
+              ? 'En attente de joueurs…'
+              : `Lancer l'expérience → (${tousPretsCount}/${joueurs.length} prêts)`}
+          </button>
+        )}
+      </div>
     </div>
   )
 }

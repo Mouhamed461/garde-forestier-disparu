@@ -1,0 +1,228 @@
+/* ─── Page ──────────────────────────────────────────────────────── */
+.lobby {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 20% 80%, #394535aa 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, #384F5466 0%, transparent 50%),
+    #0e1210;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 20px;
+  font-family: 'Oswald', sans-serif;
+  box-sizing: border-box;
+}
+
+/* ─── Haut — titre + code ───────────────────────────────────────── */
+.lobby-haut {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.lobby-surtitre {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #7D705C;
+  margin: 0;
+}
+
+.lobby-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: #111a14;
+  border: 1px solid #394535;
+  border-radius: 8px;
+  padding: 20px 40px;
+}
+
+.code-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #7D705C;
+}
+
+.code-valeur {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  letter-spacing: 0.4em;
+  color: #CB592E;
+  text-shadow: 0 0 30px #CB592E55;
+  line-height: 1;
+}
+
+.code-hint {
+  font-size: 0.72rem;
+  color: #486E7C;
+  letter-spacing: 0.1em;
+}
+
+/* ─── Liste joueurs ─────────────────────────────────────────────── */
+.lobby-joueurs {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.joueurs-titre {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #7D705C;
+  margin: 0;
+}
+
+.joueurs-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.joueur-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #111a14;
+  border: 1px solid #394535;
+  border-radius: 4px;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.joueur-item.pret {
+  border-color: #394535cc;
+  background: #1a2d1a;
+}
+
+.joueur-nom {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #D1F3F5;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.joueur-moi {
+  font-size: 0.7rem;
+  color: #486E7C;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.joueur-statut {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: #7D705C;
+}
+
+.joueur-item.pret .joueur-statut {
+  color: #6aaa50;
+}
+
+/* ─── Barre de progression ──────────────────────────────────────── */
+.pret-barre-fond {
+  height: 3px;
+  background: #394535;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pret-barre-remplie {
+  height: 100%;
+  background: linear-gradient(to right, #486E7C, #A1C0C0);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.pret-compteur {
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: #486E7C;
+  margin: 0;
+  text-align: right;
+}
+
+/* ─── Actions ───────────────────────────────────────────────────── */
+.lobby-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-pret {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 40px;
+  background: transparent;
+  color: #A1C0C0;
+  border: 1px solid #486E7C;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-pret:hover {
+  background: #384F5433;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px #486E7C44;
+}
+
+.btn-lancer {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 16px 48px;
+  background: #CB592E;
+  color: #0e1210;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 0 20px #CB592E44;
+}
+
+.btn-lancer:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 0 40px #CB592E88;
+}
+
+.btn-lancer:disabled {
+  background: #394535;
+  color: #7D705C;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.attente-hote {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: #7D705C;
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

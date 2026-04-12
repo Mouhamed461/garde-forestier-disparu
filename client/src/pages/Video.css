@@ -1,0 +1,593 @@
+/* ─── Page ──────────────────────────────────────────────────────── */
+.video-page {
+  width: 100vw;
+  height: 100vh;
+  background: #060e07;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Oswald', sans-serif;
+}
+
+/* ─── Zone vidéo ────────────────────────────────────────────────── */
+.video-wrapper {
+  position: relative;
+  flex: 1;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.video-lecteur {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.8s ease;
+}
+
+/* Vidéo atténuée pendant les choix */
+.video-lecteur.video-attenuation {
+  opacity: 0.35;
+  filter: blur(1px) brightness(0.6);
+}
+
+/* ─── Overlay play ──────────────────────────────────────────────── */
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #00000044;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.video-overlay:hover { background: #00000022; }
+
+.play-icone {
+  font-size: 3.5rem;
+  color: #D1F3F5;
+  background: #CB592E;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 6px;
+  box-shadow: 0 0 40px #CB592E88;
+  transition: transform 0.15s;
+}
+
+.video-overlay:hover .play-icone { transform: scale(1.1); }
+
+/* ─── Overlay choix — style Carmen Sandiego ─────────────────────── */
+.choix-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 60px;
+  padding: 0 0 50px 0;
+  animation: apparition-choix 0.5s ease both;
+  pointer-events: none;
+}
+
+@keyframes apparition-choix {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Colonnes gauche / droite ──────────────────────────────────── */
+.choix-colonne {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: all;
+}
+
+.choix-colonne.gauche { align-items: flex-start; }
+.choix-colonne.droite { align-items: flex-end; }
+
+/* ─── Rectangles de choix ───────────────────────────────────────── */
+.choix-rect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 380px;
+  height: 68px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: var(--couleur, #384F54);
+  opacity: 0.92;
+  backdrop-filter: blur(8px);
+  transition: transform 0.15s, opacity 0.2s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px #00000055;
+}
+
+.choix-rect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #ffffff18 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.choix-rect:hover:not(:disabled) {
+  opacity: 1;
+  transform: scale(1.03);
+  box-shadow: 0 6px 32px #00000077;
+}
+
+.choix-rect.selectionne {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px #fff, 0 8px 32px #00000088;
+}
+
+/* Bouton gagnant — s'illumine avec sa propre couleur pendant 1.5s avant l'overlay */
+.choix-rect.gagnant {
+  background: var(--couleur) !important;
+  transform: scale(1.06) !important;
+  filter: brightness(1.25) saturate(1.4);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.22), 0 4px 20px #00000066 !important;
+  opacity: 1 !important;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s, filter 0.3s;
+}
+
+.choix-rect.estompe {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.choix-rect-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.18em;
+  color: #D1F3F5;
+  text-shadow: 0 1px 6px #000000aa;
+  z-index: 1;
+}
+
+/* ─── Centre — timer ────────────────────────────────────────────── */
+.choix-centre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  padding-bottom: 4px;
+}
+
+.choix-timer-cercle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0d1a0fee;
+  border: 2px solid #CB592E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px #CB592E66;
+}
+
+.choix-timer-chiffre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  color: #D1F3F5;
+  letter-spacing: 0.05em;
+}
+
+.choix-timer-barre-fond {
+  width: 120px;
+  height: 4px;
+  background: #ffffff22;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.choix-timer-barre-remplie {
+  height: 100%;
+  background: #CB592E;
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
+/* ─── Panneau bas ───────────────────────────────────────────────── */
+.video-bas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: #0d1a0f;
+  border-top: 1px solid #384F5433;
+}
+
+/* ─── Info panneaux ─────────────────────────────────────────────── */
+.video-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #111f13;
+  border: 1px solid #384F5444;
+  border-radius: 6px;
+  padding: 8px 14px;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.video-info.droite { justify-content: flex-end; }
+
+.info-point {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.info-point.bleu { background: #486E7C; box-shadow: 0 0 8px #486E7C99; }
+.info-point.vert { background: #4a8a2a; box-shadow: 0 0 8px #4a8a2a99; }
+
+.info-texte {
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #A1C0C0;
+  white-space: nowrap;
+}
+
+/* ─── Contrôles ─────────────────────────────────────────────────── */
+.video-controles {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.video-temps {
+  font-size: 0.78rem;
+  color: #7D705C;
+  letter-spacing: 0.05em;
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ─── Barre de progression ──────────────────────────────────────── */
+.video-barre-fond {
+  flex: 1;
+  height: 4px;
+  background: #394535;
+  border-radius: 2px;
+  position: relative;
+  cursor: default;
+}
+
+.video-barre-fond.cliquable { cursor: pointer; height: 6px; }
+.video-barre-fond.cliquable:hover { height: 8px; }
+
+.video-barre-remplie {
+  height: 100%;
+  background: #CB592E;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.video-curseur {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: #D1F3F5;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #00000088;
+  transition: left 0.1s linear;
+}
+
+/* ─── Overlay résultat ──────────────────────────────────────────── */
+.resultat-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 40px;
+  animation: apparition-choix 0.45s ease both;
+  z-index: 10;
+}
+.resultat-succes { background: #000000aa; }
+.resultat-malus  { background: #1a0e0099; }
+.resultat-mort   { background: #1a000099; }
+
+.resultat-badge {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 6px 24px;
+  border-radius: 3px;
+}
+
+.resultat-texte {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.05rem;
+  color: #D1F3F5;
+  max-width: 540px;
+  text-align: center;
+  line-height: 1.75;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 8px #000;
+}
+
+.resultat-fin-prematuree {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.3em;
+  color: #c0392b;
+  text-shadow: 0 0 24px #c0392b88;
+}
+
+.resultat-malus {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  color: #e6b800;
+  text-shadow: 0 0 16px #e6b80066;
+}
+
+/* Fond teinté rouge pour les fins mort */
+.resultat-mort {
+  background: #2a000099 !important;
+}
+
+/* Boutons de navigation post-résultat */
+.resultat-btn {
+  margin-top: 12px;
+  padding: 14px 52px;
+  border-radius: 4px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.22em;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+}
+.resultat-btn:hover {
+  transform: scale(1.05);
+}
+
+.resultat-btn-continuer {
+  background: transparent;
+  border-color: #27ae60;
+  color: #27ae60;
+  box-shadow: 0 0 0 transparent;
+}
+.resultat-btn-continuer:hover {
+  background: #27ae60;
+  color: #060e07;
+  box-shadow: 0 0 24px #27ae6066;
+}
+
+.resultat-btn-recommencer {
+  background: transparent;
+  border-color: #c0392b;
+  color: #c0392b;
+}
+.resultat-btn-recommencer:hover {
+  background: #c0392b;
+  color: #fff;
+  box-shadow: 0 0 24px #c0392b66;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EFFETS VISUELS — ÉNERGIE DU GROUPE
+   Vignette noire + flou + teinte verte selon niveau d'énergie
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Overlay vignette — positionné par-dessus la vidéo, sous les choix */
+.energie-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+  transition: box-shadow 1.2s ease, background 1.2s ease, filter 1.2s ease;
+}
+
+/* 80-100% : normal, aucun effet */
+.energie-100 .energie-vignette {
+  box-shadow: none;
+  background: transparent;
+}
+
+/* 50-79% : légère vignette noire sur les bords */
+.energie-80 .energie-vignette {
+  box-shadow: inset 0 0 80px 20px #00000055;
+}
+
+/* 30-49% : vignette forte + légère désaturation */
+.energie-50 .energie-vignette {
+  box-shadow: inset 0 0 140px 50px #000000aa;
+}
+.energie-50 .video-lecteur,
+.energie-50 .quiz-fond {
+  filter: blur(0.5px) brightness(0.85) saturate(0.7);
+}
+
+/* 10-29% : vignette très forte + flou + teinte verte (infection) */
+.energie-30 .energie-vignette {
+  box-shadow: inset 0 0 200px 80px #000000cc;
+  background: #00150088;   /* légère teinte verte */
+}
+.energie-30 .video-lecteur,
+.energie-30 .quiz-fond {
+  filter: blur(1.5px) brightness(0.65) saturate(0.4) hue-rotate(60deg);
+}
+
+/* < 10% : écran presque noir, flou maximal */
+.energie-10 .energie-vignette {
+  box-shadow: inset 0 0 300px 120px #000000ee;
+  background: #001a0099;
+}
+.energie-10 .video-lecteur,
+.energie-10 .quiz-fond {
+  filter: blur(3px) brightness(0.4) saturate(0.2) hue-rotate(80deg);
+}
+
+/* Transition douce sur la vidéo elle-même */
+.video-lecteur, .quiz-fond {
+  transition: filter 1.5s ease;
+}
+
+/* ─── Layout 2 choix : boutons plus larges, centrage vertical ───── */
+.choix-deux .choix-colonne {
+  justify-content: center;
+}
+.choix-deux .choix-rect {
+  width: 420px;
+  height: 76px;
+}
+
+/* ─── Label séquence (coin haut gauche) ────────────────────────── */
+.video-sequence-label {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  z-index: 5;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  color: #A1C0C088;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ─── Barre énergie HUD (coin haut droit) ───────────────────────── */
+.video-energie {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.energie-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: #A1C0C088;
+}
+
+.energie-barre-fond {
+  width: 100px;
+  height: 4px;
+  background: #ffffff18;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.energie-barre-remplie {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease, background 0.6s ease;
+}
+
+.energie-chiffre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #A1C0C0aa;
+  min-width: 30px;
+}
+
+/* ─── Compteur de votes (centre bas overlay choix) ──────────────── */
+.votes-compteur {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: #A1C0C0aa;
+  margin: 0;
+  text-align: center;
+}
+
+/* ─── Texte "Prochaine séquence" — mode diffusion ───────────────── */
+.diffusion-suite {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.88rem;
+  letter-spacing: 0.3em;
+  color: #7D9C80;
+  margin: 8px 0 0;
+  animation: clignotement-diffusion 2s ease infinite;
+}
+
+@keyframes clignotement-diffusion {
+  0%, 100% { opacity: 0.8; }
+  50%       { opacity: 0.3; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODE DIFFUSION — PC / TV (support passif)
+   Désactive toutes les interactions pour garantir une projection
+   plein écran sans interférences de la souris ou du clavier.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.mode-diffusion,
+.mode-diffusion * {
+  pointer-events: none !important;
+  cursor: default !important;
+  user-select: none !important;
+}
+
+/* Cache la barre de progression (inutile en mode passif) */
+.mode-diffusion .video-bas {
+  display: none;
+}
+
+/* ─── Image fond quiz ───────────────────────────────────────────── */
+.video-cachee {
+  display: none;   /* cache la vidéo pour les séquences quiz */
+}
+
+.quiz-fond {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+
+.quiz-fond-attenuation {
+  opacity: 0.35;
+  filter: blur(1px) brightness(0.55);
+}
+
+/* ─── Question quiz ─────────────────────────────────────────────── */
+.choix-question {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: #D1F3F5cc;
+  text-align: center;
+  max-width: 200px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+  text-shadow: 0 1px 8px #000a;
+  text-transform: uppercase;
+}

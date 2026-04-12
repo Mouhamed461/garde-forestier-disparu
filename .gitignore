@@ -1,0 +1,20 @@
+# Dépendances
+node_modules/
+
+# Variables d'environnement
+.env
+.env.local
+.env.*.local
+
+# Fichiers système
+.DS_Store
+
+# Outil Claude Code — ne pas versionner
+.claude/
+
+# Vidéos (fichiers lourds — dépôt séparé ou stockage externe)
+client/public/videos/*.mp4
+
+# Build
+client/dist/
+dist/

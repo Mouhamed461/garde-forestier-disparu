@@ -1,0 +1,196 @@
+═══════════════════════════════════════════════════════════════
+  GARDE FORESTIER DISPARU — SCÉNARIO COMPLET
+═══════════════════════════════════════════════════════════════
+
+PERSONNAGE PRINCIPAL : Jake Carter (garde forestier stagiaire)
+MISSION              : Retrouver un randonneur disparu en forêt
+ÉNERGIE DÉPART       : 100 points
+
+STRUCTURE : 7 séquences (3 implémentées, 4 à venir)
+  Séquences paires   → type video (vidéo + choix)
+  Séquences quiz     → type quiz (image fond + choix immédiats)
+
+BRANCHEMENTS : voir scenario.js (champ nextSequence par choix)
+
+───────────────────────────────────────────────────────────────
+  SÉQUENCE 0 (idx 0) — LE BRIEFING DE DÉPART
+  id: 1 | type: video | vidéo: /videos/1.mp4
+───────────────────────────────────────────────────────────────
+
+QUESTION : Comment Jake doit-il commencer sa progression ?
+
+  🔴 ROUGE — "Entrer immédiatement sans vérifier son équipement"
+     → nextSequence: 1 (Quiz de Survie)
+     → Énergie: 0
+     → Texte: "Jake entre sans vérifier son équipement. Il devra
+       d'abord prouver qu'il connaît les objets essentiels pour
+       survivre."
+     → Type: malus (mais sans perte d'énergie — mène au quiz)
+
+  🟢 VERT — "Consulter le cahier de survie et préparer son itinéraire"
+     → nextSequence: 2 (Skip quiz, va direct Séquence 2)
+     → Énergie: 0
+     → Texte: "Jake consulte son cahier, identifie les objets
+       vitaux et planifie son itinéraire. Il entre en forêt avec
+       une vision claire."
+     → Type: succes
+
+  🔵 BLEU — "Appeler les secours avant d'entrer pour signaler sa position"
+     → nextSequence: 2
+     → Énergie: -10
+     → Texte: "Les secours prennent note mais ne peuvent pas
+       intervenir sans localisation précise. Jake perd du temps
+       précieux."
+     → Type: malus
+
+  🟡 JAUNE — "Attendre le lendemain pour avoir plus de lumière"
+     → nextSequence: 2
+     → Énergie: -10
+     → Texte: "Attendre signifie perdre des heures critiques.
+       Le randonneur est en danger et chaque minute compte."
+     → Type: malus
+
+NOTE : Cette séquence peut être réduite à 2 choix (rouge + vert
+seulement). Retirer bleu/jaune de scenario.js si souhaité.
+
+───────────────────────────────────────────────────────────────
+  SÉQUENCE 1 (idx 1) — QUIZ DE SURVIE
+  id: 2 | type: quiz | image: /photos/1.jpg | vidéo: /videos/1.mp4
+───────────────────────────────────────────────────────────────
+
+DÉCLENCHEMENT : Uniquement si rouge choisi en Séquence 0
+                (Jake entre sans vérifier son équipement)
+
+QUESTION : Quels sont les 3 objets essentiels pour survivre
+           en forêt ?
+
+  🔴 ROUGE — "Couteau · Briquet · GPS"
+     → nextSequence: 0 (retour au Briefing)
+     → Énergie: -5
+     → Texte: "Faux. Le GPS est peu fiable en forêt dense. Sans
+       boussole ni cahier, Jake tourne en rond. Retour au briefing."
+     → Type: malus
+
+  🟢 VERT — "Boussole · Gourde · Cahier de survie" ← BONNE RÉPONSE
+     → nextSequence: 2 (continue vers Séquence 2)
+     → Énergie: 0
+     → Texte: "Correct ! Boussole, gourde et cahier de survie —
+       les 3 essentiels identifiés. Jake peut entrer en forêt."
+     → Type: succes
+
+  🔵 BLEU — "Radio · Couverture · Corde"
+     → nextSequence: 0 (retour au Briefing)
+     → Énergie: -5
+     → Texte: "Utiles en campement mais insuffisants pour
+       progresser en forêt dense. Retour au briefing."
+     → Type: malus
+
+  🟡 JAUNE — "Allumettes · Carte · Couteau"
+     → nextSequence: 0 (retour au Briefing)
+     → Énergie: -5
+     → Texte: "Sans boussole ni gourde, la mission est compromise
+       avant même de commencer. Retour au briefing."
+     → Type: malus
+
+NOTE : Les mauvaises réponses renvoient à l'idx 0 (Briefing).
+Le joueur peut retenter autant de fois que voulu (avec malus).
+
+───────────────────────────────────────────────────────────────
+  SÉQUENCE 2 (idx 2) — LE VOILE DU NORD
+  id: 3 | type: video | vidéo: /videos/2.mp4
+───────────────────────────────────────────────────────────────
+
+CONTEXTE : Jake est dans la forêt. Le brouillard s'installe.
+
+QUESTION : Comment doit-il progresser ?
+
+  🔴 ROUGE — "Avancer au hasard en espérant trouver"
+     → nextSequence: (auto, idx+1)
+     → Énergie: -20
+     → Texte: "Jack s'épuise en tournant en rond pendant 2 heures.
+       Il perd de l'énergie et du temps précieux."
+     → Type: malus
+
+  🟢 VERT — "Utiliser la boussole pour maintenir le cap"
+     → nextSequence: (auto, idx+1)
+     → Énergie: 0
+     → Texte: "Jack maintient son cap malgré le brouillard.
+       Il progresse efficacement vers le randonneur."
+     → Type: succes
+
+  🔵 BLEU — "S'arrêter et attendre que le brouillard se lève"
+     → nextSequence: (auto, idx+1)
+     → Énergie: -10
+     → Texte: "Jack attend que le brouillard se lève.
+       Du temps précieux est perdu."
+     → Type: malus
+
+  🟡 JAUNE — "Rebrousser chemin par sécurité"
+     → nextSequence: (auto, idx+1)
+     → Énergie: -15
+     → Texte: "Jack recule et perd du terrain.
+       Le randonneur est toujours en danger."
+     → Type: malus
+
+───────────────────────────────────────────────────────────────
+  SÉQUENCES 3 à 6 — À DÉFINIR
+───────────────────────────────────────────────────────────────
+
+Ces séquences sont à construire progressivement.
+Pour chaque nouvelle séquence, ajouter :
+
+  1. Dans scenario.js → objet dans SEQUENCES[] :
+     {
+       id: X,
+       type: 'video' ou 'quiz',
+       titre: 'Titre de la séquence',
+       video: '/videos/X.mp4',
+       image: '/photos/X.jpg',  // pour type quiz seulement
+       choix: {
+         rouge:  { label: '...', consequence: 'continuer', energie: 0 },
+         vert:   { label: '...', consequence: 'continuer', energie: 0 },
+         bleu:   { label: '...', consequence: 'continuer', energie: -10 },
+         jaune:  { label: '...', consequence: 'continuer', energie: -15 },
+       }
+     }
+
+  2. Dans data/sequences.js → objet indexé par id :
+     X: {
+       question: '...',
+       choix: { rouge: '...', vert: '...', bleu: '...', jaune: '...' },
+       consequences: {
+         rouge:  { texte: '...', type: 'malus',  energieDelta: 0 },
+         vert:   { texte: '...', type: 'succes', energieDelta: 0 },
+         bleu:   { texte: '...', type: 'malus',  energieDelta: -10 },
+         jaune:  { texte: '...', type: 'malus',  energieDelta: -15 },
+       }
+     }
+
+TYPES DE CONSÉQUENCES :
+  "succes"  → continue sans pénalité visuelle
+  "malus"   → overlay orange, continue avec perte d'énergie
+  "mort"    → overlay rouge, fin prématurée → page Résultats (fin Échec)
+
+───────────────────────────────────────────────────────────────
+  FINS POSSIBLES (calculerFin dans scenario.js)
+───────────────────────────────────────────────────────────────
+
+  HÉROS        → énergie > 50  (toutes bonnes décisions)
+  SURVIVANT    → énergie 20-50 (quelques erreurs)
+  ABANDON      → énergie < 20  (beaucoup d'erreurs)
+  ÉCHEC        → séquence de type "mort" atteinte (fin prématurée)
+
+───────────────────────────────────────────────────────────────
+  MÉDIAS REQUIS
+───────────────────────────────────────────────────────────────
+
+  /videos/1.mp4  → Briefing Jake + entrée en forêt       ✓ (fourni)
+  /videos/2.mp4  → Le Voile du Nord (brouillard)         ✓ (fourni)
+  /videos/3.mp4  → Séquence 3 (à venir)
+  /videos/4.mp4  → Séquence 4 (à venir)
+  /videos/5.mp4  → Séquence 5 (à venir)
+  /videos/6.mp4  → Séquence 6 (à venir)
+  /videos/7.mp4  → Séquence 7 / Fin (à venir)
+  /photos/1.jpg  → Fond quiz Séquence 1                  ✓ (fourni)
+
+═══════════════════════════════════════════════════════════════

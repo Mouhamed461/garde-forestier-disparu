@@ -1,38 +1,43 @@
-// Fichier principal — routing entre toutes les pages
-import React from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import './styles/theme-pro.css'
+// Routing principal de l'application.
+// Console (PC/TV ≥ 1200px) → /video  (diffusion passive)
+// Manette (iPad/tablette)  → /choix  (contrôleur tactile)
 
-import Accueil from './pages/Accueil'
-import Lobby from './pages/Lobby'
-import Video from './pages/Video'
-import Choix from './pages/Choix'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import useAppareil from './hooks/useDevice'
+
+import Accueil   from './pages/Accueil'
+import Video     from './pages/Video'
+import Choix     from './pages/Choix'
 import Resultats from './pages/Resultats'
 
-function App() {
-  // Toggle this flag to instantly enable/disable the pro styling layer.
-  const ENABLE_PRO_STYLE = true
+// Redirige les tablettes et téléphones vers /choix.
+// Video gère elle-même le reset sur changement de séquence (key={sequenceIndex}).
+function RouteVideo() {
+  const location = useLocation()
+  const appareil = useAppareil()
 
+  if (appareil === 'telephone' || appareil === 'tablette') {
+    return <Navigate to="/choix" state={location.state} replace />
+  }
+
+  return <Video />
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/"          element={<Accueil />} />
+      <Route path="/video"     element={<RouteVideo />} />
+      <Route path="/choix"     element={<Choix />} />
+      <Route path="/resultats" element={<Resultats />} />
+    </Routes>
+  )
+}
+
+function App() {
   return (
     <BrowserRouter>
-      <div className={ENABLE_PRO_STYLE ? 'theme-pro' : ''}>
-        <Routes>
-          {/* Page d'accueil */}
-          <Route path="/" element={<Accueil />} />
-
-          {/* Salle d'attente */}
-          <Route path="/lobby" element={<Lobby />} />
-
-          {/* Lecteur vidéo */}
-          <Route path="/video" element={<Video />} />
-
-          {/* Écran de choix */}
-          <Route path="/choix" element={<Choix />} />
-
-          {/* Résultats finaux */}
-          <Route path="/resultats" element={<Resultats />} />
-        </Routes>
-      </div>
+      <AppRoutes />
     </BrowserRouter>
   )
 }

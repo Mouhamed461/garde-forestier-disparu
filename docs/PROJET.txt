@@ -1,0 +1,142 @@
+═══════════════════════════════════════════════════════════════
+  GARDE FORESTIER DISPARU — VUE D'ENSEMBLE DU PROJET
+═══════════════════════════════════════════════════════════════
+
+NOM DU PROJET : Le Garde Forestier Disparu (Jack Carter)
+CONTEXTE      : Projet 3 — CEGEP, Section 4, EFC
+DATE MAJ      : Avril 2026
+
+───────────────────────────────────────────────────────────────
+  DESCRIPTION
+───────────────────────────────────────────────────────────────
+
+Expérience interactive narrative asymétrique.
+Jake Carter, garde forestier stagiaire, est envoyé secourir un
+randonneur disparu en forêt. La Manette (iPad) pilote le flux
+narratif via des choix votés ; la Console (PC / TV) diffuse
+la vidéo en plein écran.
+
+FORMAT        : Serious game / Film interactif (style Black Mirror)
+DURÉE         : ~15-20 minutes (7 séquences)
+APPAREILS     : 1 Console (PC / TV) + 1 Manette (iPad)
+PLATEFORME    : Navigateur web — architecture Console / Manette
+
+PARADIGME D'AFFICHAGE (session unique, Avril 2026) :
+  Console (PC / TV) → Diffusion passive 1920×1080, pointer-events: none
+  Manette (iPad)    → Contrôleur tactile : play/pause + vote ○ △ □ ◇
+
+───────────────────────────────────────────────────────────────
+  STACK TECHNIQUE
+───────────────────────────────────────────────────────────────
+
+CLIENT
+  Framework   : React 19 + Vite
+  Routing     : React Router DOM v7
+  Temps réel  : Socket.io-client
+  Style       : CSS pur (pas de Tailwind)
+  Polices     : Oswald, Bebas Neue (Google Fonts)
+
+SERVEUR
+  Runtime     : Node.js + Express
+  Temps réel  : Socket.io (port 4000)
+  Stockage    : Sessions en mémoire (objet JS simple)
+  CORS        : origin '*', credentials: false (Safari/iOS)
+
+───────────────────────────────────────────────────────────────
+  STRUCTURE DES DOSSIERS
+───────────────────────────────────────────────────────────────
+
+garde-forestier-disparu/
+├── client/
+│   ├── public/
+│   │   ├── videos/       ← 1.mp4, 2.mp4 ... 7.mp4
+│   │   ├── photos/       ← 1.jpg (fond quiz séquence 2)
+│   │   └── audio/        ← sons d'ambiance (optionnel)
+│   └── src/
+│       ├── App.jsx           ← Routing : Console → /video, Manette → /choix
+│       ├── socket.js         ← Singleton Socket.io (polling → websocket)
+│       ├── scenario.js       ← Logique de navigation + branchements
+│       ├── data/
+│       │   └── sequences.js  ← Textes narratifs par séquence.id
+│       ├── hooks/
+│       │   └── useDevice.js  ← Détection Console / Manette / iPad
+│       └── pages/
+│           ├── Accueil.jsx   ← Console : génère code | Manette : rejoint
+│           ├── Video.jsx     ← Console : lecteur passif plein écran
+│           ├── Choix.jsx     ← Manette : play/pause + vote ○ △ □ ◇
+│           └── Resultats.jsx ← Écran de fin (héros/survivant/abandon/échec)
+├── server/
+│   └── server.js             ← Serveur Node.js : session unique, auto-launch
+└── docs/
+    ├── PROJET.txt            ← Ce fichier
+    ├── SCENARIO.txt          ← Scénario complet avec séquences
+    ├── ARCHITECTURE.txt      ← Architecture technique détaillée
+    └── ETAT_DEV.txt          ← État du développement
+
+───────────────────────────────────────────────────────────────
+  LANCEMENT DU PROJET
+───────────────────────────────────────────────────────────────
+
+# Terminal 1 — Serveur
+cd server
+npm install
+node server.js
+→ Écoute sur http://localhost:4000
+
+# Terminal 2 — Client
+cd client
+npm install
+npm run dev
+→ Tourne sur http://localhost:3000
+
+ACCÈS SUR RÉSEAU LOCAL (WiFi) :
+  1. Trouver l'IP locale du PC : ipconfig
+  2. Console : ouvrir http://[IP]:3000 sur le PC / TV
+  3. Manette : ouvrir http://[IP]:3000 sur l'iPad
+
+───────────────────────────────────────────────────────────────
+  MÉCANIQUE DE JEU
+───────────────────────────────────────────────────────────────
+
+1. La Console (PC) ouvre l'appli → choisit "Console" → génère un code
+2. Le code s'affiche à l'écran en grand (ex: KXVNM)
+3. La Manette (iPad) ouvre l'appli → choisit "Manette" → saisit le code
+4. Dès la connexion de la Manette → l'expérience démarre automatiquement
+   - Console → /video (diffusion passive plein écran)
+   - Manette → /choix (interface contrôleur tactile)
+5. La Manette appuie ▶ → vidéo démarre sur la Console
+6. À la fin de la vidéo, les boutons ○ △ □ ◇ s'affichent sur la Manette
+7. La Manette vote (15 secondes max) → résultat immédiat (1 votant)
+8. Console : overlay résultat → navigation automatique
+   Manette : symbole gagnant → séquence suivante
+9. À la dernière séquence → page Résultats avec la fin
+
+ÉNERGIE DU GROUPE : commence à 100
+  > 50%  → Fin Héros
+  20-50% → Fin Survivant
+  < 20%  → Fin Abandon
+  (mort) → Fin Échec (séquence de type fin-prematuree)
+
+───────────────────────────────────────────────────────────────
+  VISUELS CLÉS (charte graphique)
+───────────────────────────────────────────────────────────────
+
+COULEURS PRINCIPALES :
+  #060e07  — Fond très sombre (vert forêt nuit)
+  #0d1a0f  — Panneaux bas
+  #CB592E  — Orange brûlé (accents, timer, code session)
+  #D1F3F5  — Blanc glacé (textes)
+  #384F54  — Gris forêt (boutons neutres)
+
+BOUTONS MANETTE :
+  ○ ROUGE — Cercle    △ VERT  — Triangle
+  □ BLEU  — Carré     ◇ JAUNE — Losange
+
+EFFETS ÉNERGIE (CSS vignette sur video-wrapper) :
+  100-80% → Normal
+  79-50%  → Légère vignette noire
+  49-30%  → Vignette forte + désaturation
+  29-10%  → Vignette + flou + teinte verte (infection)
+  < 10%   → Écran presque noir + flou maximal
+
+═══════════════════════════════════════════════════════════════

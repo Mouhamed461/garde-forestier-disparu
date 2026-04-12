@@ -1,0 +1,113 @@
+/* ═══════════════════════════════════════════════════════════════════
+   SceneDescription — Carte narrative centrée sur l'écran
+   Visible pendant les choix uniquement (absente pendant vidéo/photo)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.scene-desc {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+
+  /* Fond solide — lisible sur la vidéo floutée */
+  background: rgba(6, 14, 7, 0.88);
+  border-top: 2px solid rgba(203, 89, 46, 0.55);
+  border-left: 1px solid rgba(209, 243, 245, 0.06);
+  border-right: 1px solid rgba(209, 243, 245, 0.06);
+  border-bottom: 1px solid rgba(209, 243, 245, 0.06);
+  border-radius: 8px;
+
+  /* Dimensions */
+  max-width: 680px;
+  width: calc(100% - 48px);
+  padding: 28px 40px 30px;
+
+  text-align: center;
+  pointer-events: none;
+
+  /* Transition : fondu + translation verticale */
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* ─── États ────────────────────────────────────────────────────── */
+
+.scene-desc-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.scene-desc-cachee {
+  opacity: 0;
+  transform: translateX(-50%) translateY(calc(-50% - 14px));
+}
+
+/* ─── Étiquette "SITUATION" ─────────────────────────────────────── */
+
+.scene-desc-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #CB592E;
+  margin-bottom: 16px;
+}
+
+/* Tirets décoratifs oranges en fondu */
+.scene-desc-label::before,
+.scene-desc-label::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 1px;
+  flex-shrink: 0;
+}
+
+.scene-desc-label::before {
+  background: linear-gradient(to right, transparent, rgba(203, 89, 46, 0.7));
+}
+
+.scene-desc-label::after {
+  background: linear-gradient(to left, transparent, rgba(203, 89, 46, 0.7));
+}
+
+/* ─── Corps du texte ────────────────────────────────────────────── */
+
+.scene-desc-texte {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+  font-size: 1.12rem;
+  color: #D1F3F5;
+  line-height: 1.78;
+  letter-spacing: 0.045em;
+  max-width: 600px;
+  margin: 0 auto;
+  text-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.9),
+    0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Responsive ────────────────────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .scene-desc {
+    padding: 22px 24px 24px;
+  }
+  .scene-desc-texte {
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 420px) {
+  .scene-desc {
+    padding: 16px 16px 18px;
+    width: calc(100% - 24px);
+  }
+  .scene-desc-texte {
+    font-size: 0.88rem;
+  }
+}

@@ -1,0 +1,138 @@
+═══════════════════════════════════════════════════════════════
+  GARDE FORESTIER DISPARU — ÉTAT DU DÉVELOPPEMENT
+  Dernière mise à jour : Avril 2026
+═══════════════════════════════════════════════════════════════
+
+───────────────────────────────────────────────────────────────
+  CE QUI FONCTIONNE ✓
+───────────────────────────────────────────────────────────────
+
+  INFRASTRUCTURE — SESSION UNIQUE (Console + Manette)
+  ✓ Page d'accueil : choix Console (PC) / Manette (iPad)
+  ✓ Console génère un code de session → panneau d'attente avec code
+  ✓ Manette rejoint avec le code → démarrage immédiat (sans lobby)
+  ✓ Routing asymétrique : Console → /video, Manette → /choix (via RouteVideo)
+  ✓ Détection iPad (iPadOS 13+ : MacIntel + maxTouchPoints > 1)
+
+  DIFFUSION (Console / PC / TV — /video)
+  ✓ Mode diffusion passif : pointer-events: none sur toute la page
+  ✓ Lecteur vidéo plein écran synchronisé (reçoit play/pause/seek)
+  ✓ Boucle lente (0.18x) pendant la phase de vote
+  ✓ Overlay résultat en lecture seule
+  ✓ Navigation automatique après aller-consequence (3.5s)
+  ✓ Effets visuels CSS selon niveau d'énergie (vignette + flou)
+  ✓ HUD énergie + label séquence (coin haut)
+
+  MANETTE (iPad — /choix)
+  ✓ Boutons de vote avec symboles : ○ (Cercle) △ (Triangle) □ (Carré) ◇ (Losange)
+  ✓ Bouton play/pause vidéo distante (isHote: true → Manette est l'hôte)
+  ✓ Timer 15 secondes avec cercle coloré
+  ✓ Vote immédiat (1/1 votant en session unique)
+  ✓ Affichage du symbole gagnant + texte (2.5s) puis séquence suivante
+  ✓ Responsive tactile (< 768px : 2 colonnes, ≥ 768px : boutons plus grands)
+  ✓ Gestion des séquences sans rechargement de page (setSeqIdx)
+
+  COMPATIBILITÉ SAFARI / iOS
+  ✓ transports: ['polling', 'websocket'] — correctif Safari sur IP locale
+  ✓ Serveur : allowEIO3: true + CORS origin:'*' + credentials: false
+  ✓ play() wrappé dans .catch(() => {}) pour Safari
+  ✓ Détection iPadOS 13+ (MacIntel + maxTouchPoints)
+
+  MÉCANIQUE
+  ✓ Vote individuel par couleur → symbole
+  ✓ Fallback aléatoire si personne ne vote (timer expiré)
+  ✓ Calcul de majorité côté serveur (randomisation des ex-aequo)
+  ✓ Synchronisation du résultat sur Console + Manette
+  ✓ Perte d'énergie appliquée côté serveur
+  ✓ Branchement explicite via nextSequence
+  ✓ Séquences de type quiz (fond image, choix immédiats)
+  ✓ Remontage React forcé entre séquences sur Console (key={location.key})
+  ✓ Page Résultats avec 4 types de fin (héros/survivant/abandon/échec)
+  ✓ Animation lucioles sur Résultats
+  ✓ Bouton REJOUER sur Résultats → retour à l'accueil
+
+───────────────────────────────────────────────────────────────
+  CE QUI EST À FAIRE ✗
+───────────────────────────────────────────────────────────────
+
+  ✗ Vidéos 3 à 7 (médias à fournir → /public/videos/3.mp4 ... 7.mp4)
+  ✗ Séquences 3 à 6 à définir dans scenario.js et data/sequences.js
+  ✗ Inventaire d'objets (corde, briquet, boussole...)
+  ✗ Écran de résultat dédié pour fin "mort" (fin-prematuree)
+  ✗ Son d'ambiance / bande sonore
+  ✗ Tests sur iPad réel sur le réseau WiFi (Safari)
+
+───────────────────────────────────────────────────────────────
+  BUGS CONNUS / POINTS D'ATTENTION
+───────────────────────────────────────────────────────────────
+
+  ⚠ Si le serveur redémarre → toutes les sessions sont perdues
+    Console et Manette doivent recommencer depuis l'accueil
+
+  ⚠ Si la Manette se déconnecte pendant la vidéo → session supprimée
+    Pas de reconnexion implémentée
+
+  ⚠ Navigation automatique Console (3.5s) et Manette (2.5s) :
+    si la latence réseau est élevée, les deux écrans peuvent
+    se désynchroniser d'une séquence. À surveiller en test WiFi.
+
+  ⚠ Pour déploiement sur réseau local (WiFi) :
+    socket.js détecte automatiquement l'IP (window.location.hostname)
+    → Console : http://[IP_DU_PC]:3000 (sur le PC)
+    → Manette : http://[IP_DU_PC]:3000 (sur l'iPad)
+
+───────────────────────────────────────────────────────────────
+  BUGS RÉSOLUS (historique)
+───────────────────────────────────────────────────────────────
+
+  ✓ Refonte Console/Manette (Avril 2026)
+    → Suppression du lobby multijoueur
+    → Session unique : 1 Console + 1 Manette
+    → Démarrage immédiat dès connexion de la Manette
+    → Manette = isHote (contrôle play/pause + calculer-vote)
+    → Console n'est plus dans joueurs[] → nbJoueurs = 1 → vote immédiat
+
+  ✓ Correctif iPadOS 13+ (Avril 2026)
+    → Détection MacIntel + maxTouchPoints > 1 dans useDevice.js
+
+  ✓ BOGUE : Timer s'arrête mais rien ne se passe
+    → Fix : pattern useRef pour toutes les valeurs async (stale closures)
+
+  ✓ BOGUE : Double-soumission du résultat
+    → Fix : resultSoumisRef boolean guard (dans Choix.jsx)
+
+  ✓ BOGUE : Overlay de séquence 1 restait affiché en séquence 2
+    → Fix : key={location.key} dans App.jsx (Console)
+    → Sur Manette : setSeqIdx() réinitialise tout sans remontage
+
+  ✓ BOGUE : socket.off() retirait tous les listeners
+    → Fix : références nommées pour tous les handlers
+
+  ✓ BOGUE : Safari/iOS bloque Socket.io sur IP locale
+    → Fix : transports polling → websocket + withCredentials: false
+    → Serveur : allowEIO3: true + CORS sans credentials
+
+───────────────────────────────────────────────────────────────
+  ORDRE DE PRIORITÉ RECOMMANDÉ
+───────────────────────────────────────────────────────────────
+
+  1. Fournir les vidéos 3-7 dans client/public/videos/
+  2. Ajouter les séquences 3-6 dans scenario.js + sequences.js
+  3. Tester en session unique sur WiFi avec l'iPad (Safari)
+  4. Implémenter l'inventaire d'objets si le temps le permet
+  5. Sons d'ambiance (optionnel mais immersif)
+
+───────────────────────────────────────────────────────────────
+  POUR AJOUTER UNE SÉQUENCE (checklist)
+───────────────────────────────────────────────────────────────
+
+  □ Copier le fichier vidéo dans client/public/videos/N.mp4
+  □ Dans scenario.js : ajouter l'objet dans SEQUENCES[]
+      → type, id, titre, video, choix (rouge/vert/bleu/jaune)
+      → pour chaque choix : label, consequence, energie, nextSequence
+  □ Dans data/sequences.js : ajouter l'objet indexé par id
+      → question, choix (textes descriptifs), consequences (texte+type+delta)
+  □ Tester la navigation (séquence précédente → nouvelle → suivante)
+  □ Vérifier le bon affichage de l'énergie après la séquence
+
+═══════════════════════════════════════════════════════════════

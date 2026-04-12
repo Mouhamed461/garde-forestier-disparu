@@ -1,0 +1,246 @@
+/* ─── Page ──────────────────────────────────────────────────────── */
+.resultats-page {
+  width: 100vw;
+  min-height: 100vh;
+  background: #060e07;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Arbres silhouette ─────────────────────────────────────────── */
+.res-arbres {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 260px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 260'%3E%3Cpolygon points='0,260 60,80 120,260' fill='%230a1a0b'/%3E%3Cpolygon points='80,260 160,40 240,260' fill='%230d1f0e'/%3E%3Cpolygon points='200,260 300,20 400,260' fill='%230a1a0b'/%3E%3Cpolygon points='360,260 460,60 560,260' fill='%230d1f0e'/%3E%3Cpolygon points='500,260 620,10 740,260' fill='%230a1a0b'/%3E%3Cpolygon points='700,260 820,50 940,260' fill='%230d1f0e'/%3E%3Cpolygon points='900,260 1020,30 1140,260' fill='%230a1a0b'/%3E%3Cpolygon points='1080,260 1200,70 1320,260' fill='%230d1f0e'/%3E%3Cpolygon points='1260,260 1350,90 1440,260' fill='%230a1a0b'/%3E%3C/svg%3E")
+    bottom center / cover no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Lucioles ──────────────────────────────────────────────────── */
+.res-lucioles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.res-luciole {
+  position: absolute;
+  top: -10px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #b8f5a0;
+  box-shadow: 0 0 8px 3px #b8f5a066;
+  animation: res-luciole-chute linear infinite;
+  opacity: 0;
+}
+
+@keyframes res-luciole-chute {
+  0%   { transform: translateY(0) translateX(0);   opacity: 0; }
+  10%  { opacity: 0.9; }
+  90%  { opacity: 0.7; }
+  100% { transform: translateY(110vh) translateX(30px); opacity: 0; }
+}
+
+/* ─── Contenu central ───────────────────────────────────────────── */
+.resultats-contenu {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 60px 40px 80px;
+  max-width: 640px;
+  width: 100%;
+  text-align: center;
+  animation: apparition-resultats 0.8s ease both;
+}
+
+@keyframes apparition-resultats {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Icone fin ─────────────────────────────────────────────────── */
+.fin-icone {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 20px currentColor);
+}
+
+/* ─── Titres ────────────────────────────────────────────────────── */
+.fin-titre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.8rem;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  margin: 0;
+  text-shadow: 0 2px 20px #00000088;
+}
+
+.fin-sous-titre {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #7a9a7a;
+  margin: 0;
+}
+
+/* ─── Message narratif ──────────────────────────────────────────── */
+.fin-message {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #c8dcc8;
+  max-width: 520px;
+  margin: 8px 0;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Barre énergie ─────────────────────────────────────────────── */
+.fin-energie {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  background: #0d1a0f;
+  border: 1px solid #384F5444;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.fin-energie-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: #7a9a7a;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fin-energie-barre-fond {
+  flex: 1;
+  height: 6px;
+  background: #394535;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fin-energie-barre-remplie {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s ease;
+}
+
+.fin-energie-chiffre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  min-width: 44px;
+  text-align: right;
+}
+
+/* ─── Séparateur ────────────────────────────────────────────────── */
+.fin-separateur {
+  width: 60px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.6;
+}
+
+/* ─── Info joueur ───────────────────────────────────────────────── */
+.fin-joueur {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a9a7a;
+  margin: 0;
+}
+
+.fin-joueur-point {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── Bouton rejouer ────────────────────────────────────────────── */
+.fin-bouton {
+  margin-top: 8px;
+  padding: 14px 52px;
+  background: transparent;
+  border: 2px solid var(--couleur-fin, #27ae60);
+  border-radius: 4px;
+  color: var(--couleur-fin, #27ae60);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.22em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.fin-bouton:hover {
+  background: var(--couleur-fin, #27ae60);
+  color: #060e07;
+  box-shadow: 0 0 28px var(--lueur-fin, #27ae6088);
+  transform: scale(1.04);
+}
+
+/* ─── Overlay résultat dans Video.jsx ───────────────────────────── */
+.resultat-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #00000099;
+  animation: apparition-resultats 0.4s ease both;
+  z-index: 10;
+}
+
+.resultat-couleur {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  letter-spacing: 0.22em;
+  color: #D1F3F5;
+  padding: 10px 44px;
+  border-radius: 5px;
+  text-shadow: 0 2px 10px #00000088;
+}
+
+.resultat-message {
+  font-size: 1rem;
+  color: #D1F3F5;
+  max-width: 480px;
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 6px #000;
+}
+
+/* ─── Compteur de votes ─────────────────────────────────────────── */
+.votes-compteur {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  color: #D1F3F5aa;
+  margin: 0;
+}

@@ -1,0 +1,392 @@
+/* ─── Page ──────────────────────────────────────────────────────── */
+.accueil {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 30% 70%, #394535cc 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 30%, #384F5488 0%, transparent 50%),
+    #0e1210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+}
+
+/* ─── Grain/texture overlay ─────────────────────────────────────── */
+.accueil::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 180px;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── Lucioles ──────────────────────────────────────────────────── */
+.luciole {
+  position: absolute;
+  border-radius: 50%;
+  background: #A1C0C0;
+  box-shadow: 0 0 6px 2px #A1C0C099, 0 0 16px 4px #486E7C44;
+  animation: voler linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes voler {
+  0%   { transform: translate(0, 0) scale(1);   opacity: 0; }
+  15%  { opacity: 0.9; }
+  55%  { transform: translate(var(--dx, 40px), var(--dy, -60px)) scale(1.2); opacity: 0.6; }
+  100% { transform: translate(calc(var(--dx, 40px) * 1.8), calc(var(--dy, -60px) * 1.6)) scale(0.7); opacity: 0; }
+}
+
+.luciole:nth-child(3n)   { --dx: 50px;  --dy: -70px; background: #D1F3F5; }
+.luciole:nth-child(3n+1) { --dx: -35px; --dy: -55px; background: #A1C0C0; }
+.luciole:nth-child(3n+2) { --dx: 25px;  --dy: -90px; background: #486E7C; }
+
+/* ─── Brume ─────────────────────────────────────────────────────── */
+.brume {
+  position: absolute;
+  left: -5%;
+  width: 110%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.brume-bas {
+  bottom: 0;
+  height: 200px;
+  background: linear-gradient(to top, #0e1210ee 0%, transparent 100%);
+  animation: brume-derive 20s ease-in-out infinite alternate;
+}
+
+.brume-haut {
+  top: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, #0e1210cc 0%, transparent 100%);
+}
+
+@keyframes brume-derive {
+  from { transform: translateX(0); }
+  to   { transform: translateX(3%); }
+}
+
+/* ─── Ligne décorative ──────────────────────────────────────────── */
+.ligne-deco {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.ligne-deco::before,
+.ligne-deco::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #CB592E88, transparent);
+}
+
+.ligne-deco span {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #CB592E;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* ─── Contenu central ───────────────────────────────────────────── */
+.accueil-contenu {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.accueil-titre {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 0.92;
+  color: #D1F3F5;
+  text-shadow: 0 0 60px #384F5466, 0 4px 8px #00000099;
+  animation: apparition 1.2s ease both;
+}
+
+.accueil-titre .accent {
+  color: #CB592E;
+  text-shadow:
+    0 0 20px #CB592E66,
+    0 0 60px #CB592E33,
+    0 4px 8px #00000099;
+  animation: lueur-accent 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes lueur-accent {
+  from { text-shadow: 0 0 20px #CB592E55, 0 0 50px #CB592E22; }
+  to   { text-shadow: 0 0 40px #CB592Eaa, 0 0 90px #CB592E55; }
+}
+
+.accueil-sous-titre {
+  margin: 0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7D705C;
+  animation: apparition 1.6s ease both;
+}
+
+@keyframes apparition {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Boutons ───────────────────────────────────────────────────── */
+.accueil-boutons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 8px;
+  animation: apparition 2s ease both;
+}
+
+.btn-hote,
+.btn-joueur {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-hote {
+  background: #CB592E;
+  color: #0e1210;
+  border: none;
+  box-shadow: 0 0 20px #CB592E44, 0 4px 12px #00000055;
+}
+
+.btn-hote:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 0 40px #CB592E88, 0 8px 24px #00000066;
+}
+
+.btn-joueur {
+  background: transparent;
+  color: #A1C0C0;
+  border: 1px solid #486E7C88;
+  box-shadow: inset 0 0 20px #384F5422;
+}
+
+.btn-joueur:hover {
+  transform: translateY(-3px) scale(1.04);
+  background: #384F5433;
+  border-color: #A1C0C0aa;
+  box-shadow: 0 0 24px #486E7C55, 0 8px 24px #00000066;
+}
+
+.btn-icone {
+  font-size: 1.3rem;
+}
+
+.btn-texte {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.btn-texte strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btn-texte small {
+  font-size: 0.68rem;
+  opacity: 0.6;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.separateur {
+  font-size: 0.7rem;
+  color: #7D705C;
+  letter-spacing: 0.2em;
+}
+
+/* ─── Formulaires ───────────────────────────────────────────────── */
+.accueil-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+  animation: apparition 0.3s ease both;
+}
+
+.form-titre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.1em;
+  color: #D1F3F5;
+  margin: 0;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: #111a14;
+  border: 1px solid #384F5466;
+  border-radius: 4px;
+  color: #D1F3F5;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: #A1C0C0;
+}
+
+.form-input-code {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.form-input::placeholder {
+  color: #7D705C;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+}
+
+.form-erreur {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #CB592E;
+  letter-spacing: 0.06em;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.btn-retour {
+  background: transparent;
+  border: 1px solid #394535;
+  color: #7D705C;
+  padding: 12px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-retour:hover {
+  border-color: #7D705C;
+  color: #A1C0C0;
+}
+
+.btn-hote:disabled,
+.btn-joueur:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Arbres silhouette ─────────────────────────────────────────── */
+.arbres {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.arbre {
+  position: absolute;
+  bottom: 0;
+  background: #060c07;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.arbre-1 { left: -3%;  width: 200px; height: 500px; opacity: 1; }
+.arbre-2 { left: 6%;   width: 140px; height: 360px; opacity: 0.9; }
+.arbre-3 { right: -3%; width: 220px; height: 540px; opacity: 1; }
+.arbre-4 { right: 7%;  width: 150px; height: 400px; opacity: 0.9; }
+.arbre-5 { left: 48%;  width: 90px;  height: 200px; opacity: 0.3; }
+
+/* ─── Panneau d'attente Console (PC attend la Manette iPad) ─────── */
+.attente-ipad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: apparition 0.4s ease both;
+}
+
+.session-code-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 12vw, 6rem);
+  letter-spacing: 0.3em;
+  color: #CB592E;
+  text-shadow: 0 0 40px #CB592E88, 0 0 80px #CB592E33;
+  background: #0e121066;
+  border: 1px solid #CB592E44;
+  padding: 16px 36px;
+  border-radius: 8px;
+  animation: lueur-accent 3s ease-in-out infinite alternate;
+}
+
+.attente-message {
+  margin: 0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #A1C0C0;
+  animation: pulse-attente 2s ease-in-out infinite alternate;
+}
+
+.attente-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #7D705C;
+}
+
+@keyframes pulse-attente {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}

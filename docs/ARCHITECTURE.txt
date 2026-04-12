@@ -1,0 +1,197 @@
+═══════════════════════════════════════════════════════════════
+  GARDE FORESTIER DISPARU — ARCHITECTURE TECHNIQUE
+  Dernière mise à jour : Avril 2026
+═══════════════════════════════════════════════════════════════
+
+───────────────────────────────────────────────────────────────
+  PARADIGME : CONSOLE + MANETTE (session unique)
+───────────────────────────────────────────────────────────────
+
+  ┌──────────────┬──────────────────────────────────────────────┐
+  │ Appareil     │ Rôle                                         │
+  ├──────────────┼──────────────────────────────────────────────┤
+  │ Console      │ PC / TV (≥ 1200px)                           │
+  │              │ → Support de diffusion passif → /video       │
+  │              │ → Plein écran 1920×1080, pointer-events:none │
+  │              │ → Génère le code de session, attend la       │
+  │              │   Manette, puis suit le flux automatiquement │
+  ├──────────────┼──────────────────────────────────────────────┤
+  │ Manette      │ iPad / tablette (< 1200px ou iPad UA)        │
+  │              │ → Contrôleur tactile unique → /choix         │
+  │              │ → Play/pause vidéo + vote ○ △ □ ◇            │
+  │              │ → isHote: true (soumet calculer-vote)        │
+  └──────────────┴──────────────────────────────────────────────┘
+
+  Détection dans : client/src/hooks/useDevice.js
+  Redirection dans : client/src/App.jsx (RouteVideo)
+
+───────────────────────────────────────────────────────────────
+  FLUX DE SESSION (sans lobby)
+───────────────────────────────────────────────────────────────
+
+  1. Console ouvre / → choisit "Console" → entre un nom
+  2. Socket.emit('creer-session') → serveur génère un code
+  3. Console reçoit 'session-creee' → affiche le code (panneau attente)
+  4. Manette ouvre / → choisit "Manette" → entre prénom + code
+  5. Socket.emit('rejoindre-session') → serveur émet 'session-lancee'
+  6. Console reçoit 'session-lancee' → navigate('/video', ...)
+  7. Manette reçoit 'session-lancee' → navigate('/video', ...)
+     RouteVideo redirige la tablette → /choix automatiquement
+
+  Flux de jeu :
+  [Accueil] → [Video (seq 0)] → [Video (seq 1)] → ... → [Resultats]
+               ↑_____________|  (nextSequence)
+  (Pas de lobby — démarrage immédiat dès connexion de la Manette)
+
+  Navigation via React Router state :
+  navigate('/video', { state: { code, nom, isHote, sequenceIndex, energie } })
+
+───────────────────────────────────────────────────────────────
+  CONNEXION SOCKET.IO
+───────────────────────────────────────────────────────────────
+
+  FICHIER : client/src/socket.js
+  → Singleton partagé entre toutes les pages
+  → url : http://localhost:4000 (en dev)
+  → url : http://[IP]:4000 (réseau local WiFi)
+
+  CORRECTIF SAFARI/iOS :
+  → transports: ['polling', 'websocket'] — démarre en XHR polling,
+    contourne les restrictions WebSocket de Safari sur IP locale.
+  → withCredentials: false — évite les blocages CORS préflight.
+  → Côté serveur : allowEIO3: true, CORS origin: '*', credentials: false.
+
+───────────────────────────────────────────────────────────────
+  ÉVÉNEMENTS SOCKET.IO
+───────────────────────────────────────────────────────────────
+
+  CLIENT → SERVEUR :
+  ┌──────────────────────┬─────────────────────────────────────┐
+  │ Événement            │ Payload / Émetteur                  │
+  ├──────────────────────┼─────────────────────────────────────┤
+  │ creer-session        │ nomSession (string) ← Console       │
+  │ rejoindre-session    │ { code, nomJoueur } ← Manette       │
+  │ video-jouer          │ { code, temps }     ← Manette       │
+  │ video-pause          │ { code, temps }     ← Manette       │
+  │ video-seek           │ { code, temps }     ← Manette       │
+  │ video-fin            │ code (string)       ← Console/Video │
+  │ joueur-vote          │ { code, couleur }   ← Manette       │
+  │ calculer-vote        │ { code, choix }     ← Manette       │
+  └──────────────────────┴─────────────────────────────────────┘
+
+  SERVEUR → CLIENT :
+  ┌──────────────────────┬─────────────────────────────────────┐
+  │ Événement            │ Payload                             │
+  ├──────────────────────┼─────────────────────────────────────┤
+  │ session-creee        │ { code }  → Console seulement       │
+  │ erreur-code          │ (vide)    → Manette                 │
+  │ session-lancee       │ (vide)    → Console + Manette       │
+  │ video-jouer          │ { temps } → Console (Video.jsx)     │
+  │ video-pause          │ { temps } → Console (Video.jsx)     │
+  │ video-seek           │ { temps } → Console (Video.jsx)     │
+  │ afficher-choix       │ (vide)    → Manette (excl. émetteur)│
+  │ vote-recu            │ { nbVotes, nbJoueurs }              │
+  │ aller-consequence    │ { couleur, energie, consequence,    │
+  │                      │   nextSequence }                    │
+  └──────────────────────┴─────────────────────────────────────┘
+
+───────────────────────────────────────────────────────────────
+  ARCHITECTURE DES DONNÉES — SESSION
+───────────────────────────────────────────────────────────────
+
+  sessions[code] = {
+    hote:     socket.id,         // id de la Console (PC)
+    joueurs:  [{ id, nom }],     // id de la Manette (iPad) uniquement
+    sequence: 0,
+    energie:  100,
+    votes:    { [socketId]: couleur }
+  }
+
+  NOTE : La Console n'est PAS dans joueurs[] — elle est le diffuseur.
+         La Manette est le seul votant → nbJoueurs = 1 en session unique.
+         Si tous les votants ont voté (1/1), calculer-vote est soumis
+         immédiatement par la Manette sans attendre le timer.
+
+  → Stockage en mémoire uniquement
+  → Session supprimée si la Console ou la Manette se déconnecte
+
+───────────────────────────────────────────────────────────────
+  COMPOSANT VIDEO.JSX — MODE DIFFUSION (Console)
+───────────────────────────────────────────────────────────────
+
+  1. PASSIF PAR DESIGN
+     pointer-events: none sur toute la page (classe .mode-diffusion)
+     → Aucun clic possible, curseur désactivé
+
+  2. AUTO-PLAY
+     Démarre sur réception de 'video-jouer' depuis la Manette.
+     play() wrappé dans .catch(() => {}) pour Safari.
+
+  3. NAVIGATION AUTOMATIQUE
+     Sur 'aller-consequence' : overlay 1.5s + 3.5s → navigate() auto.
+     Pas de bouton "Continuer" — la Console suit le flux sans interaction.
+
+  4. REFS POUR CLOSURES ASYNCHRONES
+     isHoteRef, codeRef, sequenceRef, navigateRef,
+     sequenceIdxRef, nomRef, energieRef
+
+───────────────────────────────────────────────────────────────
+  COMPOSANT CHOIX.JSX — MANETTE (iPad)
+───────────────────────────────────────────────────────────────
+
+  1. SYMBOLES MANETTE
+     ROUGE → ○ (Cercle)   VERT → △ (Triangle)
+     BLEU  → □ (Carré)    JAUNE → ◇ (Losange)
+
+  2. RÔLE MANETTE (isHote: true)
+     Bouton play/pause visible — émet 'video-jouer' / 'video-pause'.
+     Émet 'calculer-vote' dès que 1/1 vote ou à expiration du timer.
+
+  3. RESPONSIVE (interface tactile)
+     < 768px  → 2 colonnes compactes
+     ≥ 768px  → boutons plus grands (mode tablette)
+
+  4. GESTION SÉQUENCES SANS RECHARGEMENT
+     setSeqIdx() met à jour la séquence sans navigate() ni rechargement.
+
+───────────────────────────────────────────────────────────────
+  FLUX D'UN TOUR DE JEU COMPLET
+───────────────────────────────────────────────────────────────
+
+  1. Manette (iPad /choix) appuie ▶ → socket.emit('video-jouer')
+  2. Serveur relaie → Console reçoit 'video-jouer' → video.play()
+  3. Vidéo se joue sur la Console (plein écran, passif)
+  4. Vidéo se termine → Console émet 'video-fin'
+     - Serveur : socket.to(code).emit('afficher-choix')
+     - Manette reçoit 'afficher-choix' → timer 15s + boutons ○ △ □ ◇
+     - Console : activerModeChoix() local (boucle lente 0.18x)
+  5. Manette appuie sur ○ △ □ ◇ → joueur-vote
+  6. Serveur : vote-recu → 1/1 voté ET isHote → calculer-vote immédiat
+  7. Serveur calcule majorité, émet aller-consequence à TOUS
+  8. Console : overlay résultat → auto-navigate 3.5s
+     Manette : symbole gagnant → setSeqIdx() 2.5s
+
+───────────────────────────────────────────────────────────────
+  CALCUL DE MAJORITÉ (server.js)
+───────────────────────────────────────────────────────────────
+
+  En session unique (1 Manette) : la majorité est toujours le vote
+  de la Manette. En cas d'absence de vote (timer expiré sans vote) →
+  sélection aléatoire parmi les 4 couleurs (ex-aequo sur 0).
+
+───────────────────────────────────────────────────────────────
+  EFFETS CSS ÉNERGIE (Video.css)
+───────────────────────────────────────────────────────────────
+
+  Classe sur .video-page selon niveau énergie :
+  ┌─────────────┬───────────────────────────────────────────┐
+  │ Classe      │ Effet                                     │
+  ├─────────────┼───────────────────────────────────────────┤
+  │ energie-100 │ Aucun effet                               │
+  │ energie-80  │ Légère vignette noire sur les bords       │
+  │ energie-50  │ Vignette forte + désaturation légère      │
+  │ energie-30  │ Vignette + flou + teinte verte (infection)│
+  │ energie-10  │ Presque noir + flou max + vert intense    │
+  └─────────────┴───────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
