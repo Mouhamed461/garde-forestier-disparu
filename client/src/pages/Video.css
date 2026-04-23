@@ -467,12 +467,33 @@
   top: 14px;
   left: 18px;
   z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.seq-barre-fond {
+  width: 72px;
+  height: 2px;
+  background: #ffffff15;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.seq-barre-fill {
+  height: 100%;
+  background: #A1C0C066;
+  border-radius: 1px;
+  transition: width 0.8s ease;
+}
+
+.seq-label-texte {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 0.8rem;
   letter-spacing: 0.18em;
   color: #A1C0C088;
   text-transform: uppercase;
-  pointer-events: none;
 }
 
 /* ─── Barre énergie HUD (coin haut droit) ───────────────────────── */
@@ -524,6 +545,16 @@
   color: #A1C0C0aa;
   margin: 0;
   text-align: center;
+}
+
+/* ─── Jauge énergie dans l'overlay résultat ─────────────────────── */
+.resultat-jauge-wrap {
+  animation: apparition-jauge 0.5s ease 0.25s both;
+}
+
+@keyframes apparition-jauge {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ─── Texte "Prochaine séquence" — mode diffusion ───────────────── */

@@ -127,6 +127,24 @@ io.on('connection', (socket) => {
     console.log('aller-consequence →', couleurMaj, '| énergie:', session.energie)
   })
 
+  // La TV se (re)connecte à la room pour continuer à recevoir les événements
+  socket.on('rejoindre-video', ({ code }) => {
+    if (sessions[code]) {
+      socket.join(code)
+      console.log('TV rejointe room', code, '— socket', socket.id)
+    }
+  })
+
+  socket.on('quitter-session', ({ code }) => {
+    const session = sessions[code]
+    console.log('quitter-session reçu, code:', code, '— session trouvée:', !!session)
+    if (!session) return
+    console.log('Émission session-terminee → room', code)
+    io.to(code).emit('session-terminee')
+    delete sessions[code]
+    console.log('Session supprimée →', code)
+  })
+
   socket.on('disconnect', () => {
     console.log('Déconnexion', socket.id)
 
@@ -142,8 +160,9 @@ io.on('connection', (socket) => {
       const avant = session.joueurs.length
       session.joueurs = session.joueurs.filter(j => j.id !== socket.id)
       if (avant > session.joueurs.length && session.joueurs.length === 0) {
+        io.to(code).emit('session-terminee')
         delete sessions[code]
-        console.log('Manette déconnectée → session supprimée', code)
+        console.log('Manette déconnectée → session-terminee + session supprimée', code)
       }
     }
   })

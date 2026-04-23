@@ -1,14 +1,9 @@
-// Manette interactive (tablette + téléphone).
-// Tous les contrôleurs passent par cette page. Le PC/TV reste sur /video.
-//
-// Rôles :
-//   Hôte (tablette) : contrôle play/pause + vote.
-//   Joueur (téléphone/tablette) : vote uniquement.
-
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import socket from '../socket'
 import { SEQUENCES, calculerFin } from '../scenario'
+import useAudio from '../hooks/useAudio'
+import JaugeEnergie from '../components/JaugeEnergie'
 import './Choix.css'
 
 const DUREE_TIMER = 15
@@ -23,6 +18,7 @@ const COULEURS = [
 function Choix() {
   const { state }  = useLocation()
   const navigate   = useNavigate()
+  const audio      = useAudio()
 
   const { code, nom, isHote } = state || {}
 
@@ -40,23 +36,25 @@ function Choix() {
   navigateRef.current = navigate
   isHoteRef.current   = isHote
 
-  const [afficherChoix,   setAfficherChoix]   = useState(false)
-  const [voteFait,        setVoteFait]        = useState(null)
-  const [couleurGagnante, setCouleurGagnante] = useState(null)
-  const [tempsRestant,    setTempsRestant]    = useState(DUREE_TIMER)
-  const [nbVotes,         setNbVotes]         = useState(0)
-  const [nbJoueurs,       setNbJoueurs]       = useState(1)
-  const [videoEnLecture,  setVideoEnLecture]  = useState(false)
+  const [afficherChoix,       setAfficherChoix]       = useState(false)
+  const [voteFait,            setVoteFait]            = useState(null)
+  const [couleurGagnante,     setCouleurGagnante]     = useState(null)
+  const [tempsRestant,        setTempsRestant]        = useState(DUREE_TIMER)
+  const [nbVotes,             setNbVotes]             = useState(0)
+  const [nbJoueurs,           setNbJoueurs]           = useState(1)
+  const [videoEnLecture,      setVideoEnLecture]      = useState(false)
+  const [afficherConfirmQuit, setAfficherConfirmQuit] = useState(false)
 
   const resultSoumisRef = useRef(false)
   const timerRef        = useRef(null)
+  const timerLoopRef    = useRef(null)
   const voteFaitRef     = useRef(null)
+  const audioRef        = useRef(audio)
 
   useEffect(() => {
     if (!code || !sequence) navigate('/', { replace: true })
   }, []) // eslint-disable-line
 
-  // Réinitialisation à chaque changement de séquence
   useEffect(() => {
     setAfficherChoix(false)
     setVoteFait(null)
@@ -89,8 +87,16 @@ function Choix() {
 
     function onAllerConsequence({ couleur, energie: nouvelleEnergie, consequence, nextSequence }) {
       clearInterval(timerRef.current)
+      if (timerLoopRef.current) { timerLoopRef.current.pause(); timerLoopRef.current = null }
       setCouleurGagnante(couleur)
       setEnergie(nouvelleEnergie)
+
+      const energieDelta = SEQUENCES[seqIdxRef.current]?.choix[couleur]?.energie ?? 0
+      if (consequence === 'fin-prematuree' || energieDelta < 0) {
+        audioRef.current.mauvaisChoix()
+      } else {
+        audioRef.current.bonChoix()
+      }
 
       setTimeout(() => {
         if (consequence === 'fin-prematuree') {
@@ -134,6 +140,7 @@ function Choix() {
       socket.off('video-jouer',       onVideoJouer)
       socket.off('video-pause',       onVideoPause)
       clearInterval(timerRef.current)
+      if (timerLoopRef.current) { timerLoopRef.current.pause(); timerLoopRef.current = null }
     }
   }, []) // eslint-disable-line
 
@@ -151,8 +158,13 @@ function Choix() {
     timerRef.current = setInterval(() => {
       restant -= 1
       setTempsRestant(restant)
+      if (restant === 5) {
+        timerLoopRef.current = audioRef.current.timerBoucle()
+      }
       if (restant <= 0) {
         clearInterval(timerRef.current)
+        if (timerLoopRef.current) { timerLoopRef.current.pause(); timerLoopRef.current = null }
+        audioRef.current.tempsFini()
         if (isHoteRef.current) soumettreResultat()
       }
     }, 1000)
@@ -160,6 +172,7 @@ function Choix() {
 
   function voter(couleurId) {
     if (voteFaitRef.current) return
+    audio.click()
     voteFaitRef.current = couleurId
     setVoteFait(couleurId)
     socket.emit('joueur-vote', { code: codeRef.current, couleur: couleurId })
@@ -169,6 +182,11 @@ function Choix() {
     if (resultSoumisRef.current) return
     resultSoumisRef.current = true
     socket.emit('calculer-vote', { code: codeRef.current, choix: SEQUENCES[seqIdxRef.current].choix })
+  }
+
+  function quitterSession() {
+    socket.emit('quitter-session', { code: codeRef.current })
+    window.location.replace('/')
   }
 
   function toggleVideo() {
@@ -192,12 +210,18 @@ function Choix() {
 
       <header className="choix-entete">
         <span className="choix-nom">{nom}</span>
-        <span className="choix-seq">{seqIdx + 1} / {SEQUENCES.length}</span>
-        <span className="choix-energie" style={{
-          color: energie > 50 ? '#27ae60' : energie > 20 ? '#e6b800' : '#c0392b'
-        }}>
-          ⚡ {energie}%
-        </span>
+        <div className="choix-entete-centre">
+          <div className="choix-seq-prog">
+            <div className="choix-seq-prog-fond">
+              <div className="choix-seq-prog-fill" style={{ width: `${(seqIdx + 1) / SEQUENCES.length * 100}%` }} />
+            </div>
+            <span className="choix-seq-num">{seqIdx + 1}/{SEQUENCES.length}</span>
+          </div>
+          <JaugeEnergie valeur={energie} segments={10} taille="sm" />
+        </div>
+        <button className="btn-quitter" onClick={() => setAfficherConfirmQuit(true)} aria-label="Quitter la partie">
+          <img src="/assets/icons/quitter.png" alt="" className="btn-quitter-icone" />
+        </button>
       </header>
 
       {couleurGagnante && (
@@ -209,7 +233,25 @@ function Choix() {
           <p className="resultat-couleur">
             {sequence.choix[couleurGagnante]?.label}
           </p>
+          <JaugeEnergie valeur={energie} segments={10} taille="md" label />
           <p className="resultat-suite">Prochaine séquence…</p>
+        </div>
+      )}
+
+      {afficherConfirmQuit && (
+        <div className="popup-overlay" onClick={() => setAfficherConfirmQuit(false)}>
+          <div className="popup-boite" onClick={e => e.stopPropagation()}>
+            <p className="popup-titre">QUITTER LA PARTIE ?</p>
+            <p className="popup-texte">La session sera détruite pour tous les joueurs.</p>
+            <div className="popup-actions">
+              <button className="popup-btn popup-annuler" onClick={() => setAfficherConfirmQuit(false)}>
+                Continuer
+              </button>
+              <button className="popup-btn popup-confirmer" onClick={quitterSession}>
+                Quitter
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -218,9 +260,12 @@ function Choix() {
 
           {isHote && (
             <button className="hote-play-btn" onClick={toggleVideo}>
-              <span className="hote-play-icone">
-                {videoEnLecture ? '⏸' : '▶'}
-              </span>
+              <img
+                className="hote-play-icone"
+                src="/assets/icons/play-button.png"
+                alt=""
+                style={{ opacity: videoEnLecture ? 0.45 : 1 }}
+              />
               <span className="hote-play-label">
                 {videoEnLecture ? 'Pause' : 'Lancer la vidéo'}
               </span>
@@ -229,7 +274,9 @@ function Choix() {
 
           {!isHote && (
             <>
-              <div className="attente-icone">▶</div>
+              <div className="attente-icone">
+                <img src="/assets/icons/play-button.png" alt="" className="attente-icone-img" />
+              </div>
               <p className="attente-titre">Regarde l'écran principal</p>
             </>
           )}
@@ -240,6 +287,8 @@ function Choix() {
 
       {!couleurGagnante && afficherChoix && (
         <div className="choix-vote">
+
+          <p className="vote-invite">CHOISISSEZ !</p>
 
           <div className="vote-header">
             <div className="vote-cercle" style={{
@@ -252,18 +301,19 @@ function Choix() {
           </div>
 
           <div className={`vote-grille ${actifs.length === 2 ? 'vote-deux' : ''}`}>
-            {actifs.map(c => (
+            {actifs.map((c, i) => (
               <button
                 key={c.id}
                 className={`vote-btn
-                  ${voteFait === c.id                   ? 'vote-selectionne' : ''}
-                  ${voteFait && voteFait !== c.id        ? 'vote-estompe'     : ''}`}
-                style={{ '--couleur': c.hex }}
+                  ${voteFait === c.id              ? 'vote-selectionne' : ''}
+                  ${voteFait && voteFait !== c.id   ? 'vote-estompe'     : ''}
+                  ${!voteFait && tempsRestant <= 5  ? 'vote-urgence'     : ''}`}
+                style={{ '--couleur': c.hex, '--i': i }}
                 onClick={() => voter(c.id)}
                 disabled={!!voteFait}
               >
                 <span className="vote-btn-label">
-                  {sequence.choix[c.id].label}
+                  {sequence.choix[c.id]?.label || c.label}
                 </span>
               </button>
             ))}

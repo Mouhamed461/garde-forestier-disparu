@@ -1,21 +1,11 @@
-// Support de diffusion passif (PC / TV).
-// Seuls les PC/TV atteignent cette page — tablettes et téléphones sont redirigés
-// vers /choix dans App.jsx (RouteVideo).
-//
-// Comportement :
-//  - Vidéo plein écran, lecture déclenchée par l'événement socket 'video-jouer'
-//  - Aucune interaction directe — pointer-events: none sur toute la page
-//  - 'aller-consequence' : affiche l'overlay puis navigue automatiquement
-
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import socket from '../socket'
 import { SEQUENCES, calculerFin } from '../scenario'
 import sequencesData from '../data/sequences'
 import SceneDescription from '../components/SceneDescription'
+import JaugeEnergie from '../components/JaugeEnergie'
 import './Video.css'
-
-const DUREE_TIMER = 15
 
 const COULEURS = [
   { id: 'rouge',  label: 'ROUGE',  hex: '#c0392b' },
@@ -32,7 +22,6 @@ function Video() {
   const sequence = SEQUENCES[sequenceIndex]
 
   const videoRef       = useRef(null)
-  const timerRef       = useRef(null)
   const isHoteRef      = useRef(isHote)
   const codeRef        = useRef(code)
   const sequenceRef    = useRef(sequence)
@@ -49,36 +38,44 @@ function Video() {
   nomRef.current         = nom
   energieRef.current     = energie
 
-  const [progression,     setProgression]     = useState(0)
-  const [duree,           setDuree]           = useState(0)
-  const [afficherChoix,   setAfficherChoix]   = useState(false)
-  const [tempsRestant,    setTempsRestant]     = useState(DUREE_TIMER)
-  const [nbVotes,         setNbVotes]         = useState(0)
-  const [nbJoueurs,       setNbJoueurs]       = useState(1)
-  const [couleurGagnante, setCouleurGagnante] = useState(null)
-  const [resultat,        setResultat]        = useState(null)
+  const [progression,   setProgression]   = useState(0)
+  const [duree,         setDuree]         = useState(0)
+  const [afficherChoix, setAfficherChoix] = useState(false)
+  const [resultat,      setResultat]      = useState(null)
+  const [energieAnimee, setEnergieAnimee] = useState(energie)
 
   useEffect(() => {
     if (!code || !sequence) navigate('/', { replace: true })
   }, []) // eslint-disable-line
 
-  // Réinitialise l'UI à chaque nouvelle séquence (sans remonter le composant).
+  // Rejoint (ou re-rejoint après reconnexion) la room socket pour recevoir session-terminee
+  useEffect(() => {
+    function rejoindre() {
+      if (codeRef.current) socket.emit('rejoindre-video', { code: codeRef.current })
+    }
+    rejoindre()
+    socket.on('connect', rejoindre)
+    return () => socket.off('connect', rejoindre)
+  }, []) // eslint-disable-line
+
   useEffect(() => {
     setProgression(0)
     setDuree(0)
     setAfficherChoix(false)
-    setTempsRestant(DUREE_TIMER)
-    setNbVotes(0)
-    setNbJoueurs(1)
-    setCouleurGagnante(null)
     setResultat(null)
-    clearInterval(timerRef.current)
 
     if (sequence?.type === 'quiz') {
       const t = setTimeout(() => activerModeChoix(), 300)
       return () => clearTimeout(t)
     }
   }, [sequenceIndex]) // eslint-disable-line
+
+  useEffect(() => {
+    if (!resultat) return
+    setEnergieAnimee(energie)
+    const t = setTimeout(() => setEnergieAnimee(resultat.nouvelleEnergie), 300)
+    return () => clearTimeout(t)
+  }, [resultat]) // eslint-disable-line
 
   useEffect(() => {
     function onVideoJouer() {
@@ -99,14 +96,7 @@ function Video() {
     function onAfficherChoix() {
       activerModeChoix()
     }
-    function onVoteRecu({ nbVotes: v, nbJoueurs: j }) {
-      setNbVotes(v)
-      setNbJoueurs(j)
-    }
     function onAllerConsequence({ couleur, energie: nouvelleEnergie, consequence, nextSequence }) {
-      clearInterval(timerRef.current)
-      setCouleurGagnante(couleur)
-
       setTimeout(() => {
         const seqId    = sequenceRef.current?.id
         const seqData  = sequencesData[seqId]
@@ -117,7 +107,6 @@ function Video() {
 
         setResultat({ couleur, texte, type, delta, nouvelleEnergie, consequence, nextSequence })
 
-        // Navigation automatique après 3.5 s
         setTimeout(() => {
           const nav  = navigateRef.current
           const c    = codeRef.current
@@ -141,7 +130,6 @@ function Video() {
     socket.on('video-pause',       onVideoPause)
     socket.on('video-seek',        onVideoSeek)
     socket.on('afficher-choix',    onAfficherChoix)
-    socket.on('vote-recu',         onVoteRecu)
     socket.on('aller-consequence', onAllerConsequence)
 
     return () => {
@@ -149,11 +137,15 @@ function Video() {
       socket.off('video-pause',       onVideoPause)
       socket.off('video-seek',        onVideoSeek)
       socket.off('afficher-choix',    onAfficherChoix)
-      socket.off('vote-recu',         onVoteRecu)
       socket.off('aller-consequence', onAllerConsequence)
-      clearInterval(timerRef.current)
     }
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    function onSessionTerminee() { window.location.replace('/') }
+    socket.on('session-terminee', onSessionTerminee)
+    return () => socket.off('session-terminee', onSessionTerminee)
+  }, [])
 
   function activerModeChoix() {
     const video = videoRef.current
@@ -162,18 +154,6 @@ function Video() {
     video.playbackRate = 0.18
     video.play().catch(() => {})
     setAfficherChoix(true)
-    demarrerTimer()
-  }
-
-  function demarrerTimer() {
-    clearInterval(timerRef.current)
-    let restant = DUREE_TIMER
-    setTempsRestant(restant)
-    timerRef.current = setInterval(() => {
-      restant -= 1
-      setTempsRestant(restant)
-      if (restant <= 0) clearInterval(timerRef.current)
-    }, 1000)
   }
 
   function surProgression() {
@@ -207,7 +187,6 @@ function Video() {
   }
 
   const tempsActuel = videoRef.current?.currentTime || 0
-  const actifs      = COULEURS.filter(c => sequence.choix[c.id])
 
   return (
     <div className={`video-page mode-diffusion ${niveauEnergie()}`}>
@@ -239,18 +218,13 @@ function Video() {
         )}
 
         <div className="video-sequence-label">
-          {sequenceIndex + 1} / {SEQUENCES.length} — {sequence.titre}
-        </div>
-
-        <div className="video-energie">
-          <span className="energie-label">ÉNERGIE</span>
-          <div className="energie-barre-fond">
-            <div className="energie-barre-remplie" style={{
-              width: energie + '%',
-              background: energie > 50 ? '#27ae60' : energie > 20 ? '#e6b800' : '#c0392b'
-            }} />
+          <div className="seq-barre-fond">
+            <div
+              className="seq-barre-fill"
+              style={{ width: `${(sequenceIndex + 1) / SEQUENCES.length * 100}%` }}
+            />
           </div>
-          <span className="energie-chiffre">{energie}%</span>
+          <span className="seq-label-texte">{sequenceIndex + 1} / {SEQUENCES.length} — {sequence.titre}</span>
         </div>
 
         {resultat && (
@@ -261,59 +235,12 @@ function Video() {
               {sequencesData[sequence?.id]?.choix?.[resultat.couleur] || resultat.couleur.toUpperCase()}
             </div>
             <p className="resultat-texte">{resultat.texte}</p>
-            {resultat.type === 'malus' && resultat.delta !== 0 && (
-              <p className="resultat-malus">ÉNERGIE {resultat.delta}%</p>
-            )}
+            <div className="resultat-jauge-wrap">
+              <JaugeEnergie valeur={energieAnimee} segments={10} taille="lg" label />
+            </div>
             <p className="diffusion-suite">Prochaine séquence…</p>
           </div>
         )}
-
-        {afficherChoix && !resultat && (() => {
-          const mi     = Math.ceil(actifs.length / 2)
-          const gauche = actifs.slice(0, mi)
-          const droite = actifs.slice(mi)
-          return (
-            <div className={`choix-overlay ${actifs.length === 2 ? 'choix-deux' : ''}`}>
-              <div className="choix-colonne gauche">
-                {gauche.map(c => (
-                  <div
-                    key={c.id}
-                    className={`choix-rect ${couleurGagnante === c.id ? 'gagnant' : ''} ${couleurGagnante && couleurGagnante !== c.id ? 'estompe' : ''}`}
-                    style={{ '--couleur': c.hex }}
-                  >
-                    <span className="choix-rect-label">{sequence.choix[c.id].label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="choix-centre">
-                {sequence.type === 'quiz' && sequence.question && (
-                  <p className="choix-question">{sequence.question}</p>
-                )}
-                <div className="choix-timer-cercle">
-                  <span className="choix-timer-chiffre">{tempsRestant}</span>
-                </div>
-                <p className="votes-compteur">{nbVotes}/{nbJoueurs}</p>
-                <div className="choix-timer-barre-fond">
-                  <div className="choix-timer-barre-remplie"
-                    style={{ width: (tempsRestant / DUREE_TIMER * 100) + '%' }} />
-                </div>
-              </div>
-
-              <div className="choix-colonne droite">
-                {droite.map(c => (
-                  <div
-                    key={c.id}
-                    className={`choix-rect ${couleurGagnante === c.id ? 'gagnant' : ''} ${couleurGagnante && couleurGagnante !== c.id ? 'estompe' : ''}`}
-                    style={{ '--couleur': c.hex }}
-                  >
-                    <span className="choix-rect-label">{sequence.choix[c.id].label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )
-        })()}
 
       </div>
 

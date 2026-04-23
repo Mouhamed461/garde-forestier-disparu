@@ -11,7 +11,7 @@ export const SEQUENCES = [
     id: 1,
     type: 'video',
     titre: 'Le briefing de départ',
-    video: '/videos/1.mp4',
+    video: '/assets/videos/1.mp4',
     choix: {
       rouge: {
         label: 'Entrer immédiatement',
@@ -40,36 +40,25 @@ export const SEQUENCES = [
     },
   },
 
-  // SÉQUENCE 1 — Quiz de Survie
+  // SÉQUENCE 1 — Première action : Regarder dans le sac ?
   {
     id: 2,
-    type: 'quiz',
-    titre: 'Quiz de Survie',
-    image: '/photos/1.jpg',
-    video: '/videos/1.mp4',
+    type: 'video',
+    titre: 'Première décision',
+    video: '/assets/videos/1.mp4',
     choix: {
+      // Bon choix : regarder dans le sac → Accès au Journal et Cahier
       rouge: {
-        label: 'Couteau · Briquet · GPS',
+        label: 'Regarder dans le sac',
         consequence: 'continuer',
-        nextSequence: 0,
-        energie: -5,
-      },
-      vert: {
-        label: 'Boussole · Gourde · Cahier de survie',
-        consequence: 'continuer',
-        nextSequence: 2,
+        nextSequence: 2,  // Continuer à la prochaine séquence
         energie: 0,
       },
-      bleu: {
-        label: 'Radio · Couverture · Corde',
+      // Mauvais choix : ne pas regarder → Quiz immédiat
+      vert: {
+        label: 'Ne pas regarder',
         consequence: 'continuer',
-        nextSequence: 0,
-        energie: -5,
-      },
-      jaune: {
-        label: 'Allumettes · Carte · Couteau',
-        consequence: 'continuer',
-        nextSequence: 0,
+        nextSequence: 2,  // Aller au quiz
         energie: -5,
       },
     },
@@ -80,7 +69,7 @@ export const SEQUENCES = [
     id: 3,
     type: 'video',
     titre: 'Le Voile du Nord',
-    video: '/videos/2.mp4',
+    video: '/assets/videos/2.mp4',
     choix: {
       rouge: {
         label: 'Avancer au hasard',
@@ -110,7 +99,7 @@ export const SEQUENCES = [
     id: 4,
     type: 'video',
     titre: 'La Rivière Gonflée',
-    video: '/videos/3.mp4',
+    video: '/assets/videos/3.mp4',
     choix: {
       rouge: {
         label: 'Traverser en force',
@@ -140,7 +129,7 @@ export const SEQUENCES = [
     id: 5,
     type: 'video',
     titre: 'Les Traces Disparaissent',
-    video: '/videos/4.mp4',
+    video: '/assets/videos/4.mp4',
     choix: {
       rouge: {
         label: 'Escalader la paroi',
@@ -170,7 +159,7 @@ export const SEQUENCES = [
     id: 6,
     type: 'video',
     titre: 'Le Randonneur Retrouvé',
-    video: '/videos/5.mp4',
+    video: '/assets/videos/5.mp4',
     choix: {
       rouge: {
         label: 'Le porter sans attelle',
@@ -200,7 +189,7 @@ export const SEQUENCES = [
     id: 7,
     type: 'video',
     titre: "L'Extraction Finale",
-    video: '/videos/6.mp4',
+    video: '/assets/videos/6.mp4',
     choix: {
       rouge: {
         label: "Forcer l'allure",

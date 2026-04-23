@@ -13,6 +13,7 @@ node_modules/
 .claude/
 
 # Vidéos (fichiers lourds — dépôt séparé ou stockage externe)
+client/public/assets/videos/*.mp4
 client/public/videos/*.mp4
 
 # Build

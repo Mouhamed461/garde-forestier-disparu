@@ -1,7 +1,3 @@
-// Page d'entrée.
-// Console (PC/TV) → crée une session → attend la Manette → /video
-// Manette (iPad)  → saisit le code → dès que la session démarre → /choix
-
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import socket from '../socket'
@@ -24,26 +20,6 @@ function Accueil() {
   const chargementRef  = useRef(false)
 
   useEffect(() => {
-    const container = containerRef.current
-    const lucioles = []
-    for (let i = 0; i < 50; i++) {
-      const l = document.createElement('span')
-      l.className = 'luciole'
-      l.style.left = Math.random() * 100 + 'vw'
-      l.style.top = Math.random() * 100 + 'vh'
-      l.style.animationDelay = Math.random() * 10 + 's'
-      l.style.animationDuration = (7 + Math.random() * 10) + 's'
-      const size = (1.5 + Math.random() * 2.5) + 'px'
-      l.style.width = size
-      l.style.height = size
-      container.appendChild(l)
-      lucioles.push(l)
-    }
-    return () => lucioles.forEach(l => l.remove())
-  }, [])
-
-  useEffect(() => {
-    // Console : session créée → afficher le code d'attente.
     function onSessionCreee({ code: sc }) {
       sessionCodeRef.current = sc
       chargementRef.current  = false
@@ -52,7 +28,6 @@ function Accueil() {
       setEtape('attente')
     }
 
-    // Session lancée → Console vers /video, Manette vers /choix.
     function onSessionLancee() {
       const estConsole = !!sessionCodeRef.current
       const c = sessionCodeRef.current || codeRef.current
@@ -127,7 +102,7 @@ function Accueil() {
         {etape === 'accueil' && (
           <div className="accueil-boutons">
             <button className="btn-hote" onClick={() => setEtape('hote')}>
-              <span className="btn-icone">🖥</span>
+              <img className="btn-icone" src="/assets/icons/monitor.png" alt="" />
               <span className="btn-texte">
                 <strong>Console</strong>
                 <small>Créer une session (PC / TV)</small>
@@ -135,7 +110,7 @@ function Accueil() {
             </button>
             <span className="separateur">ou</span>
             <button className="btn-joueur" onClick={() => setEtape('joueur')}>
-              <span className="btn-icone">🎮</span>
+              <img className="btn-icone" src="/assets/icons/console.png" alt="" />
               <span className="btn-texte">
                 <strong>Manette</strong>
                 <small>Rejoindre avec un code (iPad)</small>
@@ -214,13 +189,6 @@ function Accueil() {
         </div>
       </div>
 
-      <div className="arbres">
-        <div className="arbre arbre-1" />
-        <div className="arbre arbre-2" />
-        <div className="arbre arbre-3" />
-        <div className="arbre arbre-4" />
-        <div className="arbre arbre-5" />
-      </div>
     </div>
   )
 }

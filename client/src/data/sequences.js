@@ -1,13 +1,9 @@
-// Données narratives des séquences — textes, types et deltas d'énergie.
-// Indexé par sequence.id (correspond aux id dans scenario.js).
-//
 // type : "succes"  → continue sans pénalité
 //        "malus"   → continue avec perte d'énergie
 //        "mort"    → fin prématurée, mission terminée
 
 const sequences = {
 
-  // Séquence 1 : Le briefing de départ
   1: {
     description: "Jake Carter, jeune garde stagiaire, reçoit sa première mission. Un randonneur n'est pas rentré depuis hier soir. Chaque minute compte.",
     question: "Comment Jake doit-il commencer sa progression ?",
@@ -41,7 +37,6 @@ const sequences = {
     },
   },
 
-  // Séquence 2 : Quiz de Survie
   2: {
     description: "Jake est entré en forêt sans vérifier son sac. Il doit prouver qu'il connaît les bases avant d'aller plus loin. Un mauvais choix d'équipement peut coûter une vie.",
     question: "Quels sont les 3 objets essentiels pour survivre en forêt ?",
@@ -75,7 +70,6 @@ const sequences = {
     },
   },
 
-  // Séquence 3 : Le Voile du Nord
   3: {
     description: "Le brouillard s'installe entre les arbres. Jake ne voit pas à dix mètres devant lui. Il doit choisir comment progresser sans se perdre.",
     question: "Jack est dans la forêt. Comment doit-il progresser ?",
@@ -109,7 +103,6 @@ const sequences = {
     },
   },
 
-  // Séquence 4 : La Rivière Gonflée
   4: {
     description: "Une rivière gonflée barre le chemin. Le courant est violent. Les traces du randonneur s'arrêtent ici — il a traversé d'une façon ou d'une autre.",
     question: "Comment Jake doit-il traverser ?",
@@ -143,7 +136,6 @@ const sequences = {
     },
   },
 
-  // Séquence 5 : Les Traces Disparaissent
   5: {
     description: "Les empreintes s'arrêtent au pied d'une paroi de granite. Jake lève les yeux — la face est raide, sans prise visible. Le randonneur est monté par ici.",
     question: "Comment Jake doit-il progresser ?",
@@ -177,7 +169,6 @@ const sequences = {
     },
   },
 
-  // Séquence 6 : Le Randonneur Retrouvé
   6: {
     description: "Il est là, appuyé contre un pin, les lèvres bleues. Tibia fracturé, début d'hypothermie. Il est conscient mais ne peut pas marcher. Il reste trois heures de lumière.",
     question: "Comment Jake doit-il le prendre en charge ?",
@@ -211,7 +202,6 @@ const sequences = {
     },
   },
 
-  // Séquence 7 : L'Extraction Finale
   7: {
     description: "La station est à deux heures. Jake a le randonneur avec lui. Ses jambes tremblent, les ressources s'amenuisent. La fin est en vue, mais rien n'est encore joué.",
     question: "Comment Jake gère-t-il ces deux dernières heures ?",

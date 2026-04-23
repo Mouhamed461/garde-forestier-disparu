@@ -12,18 +12,15 @@ function Lobby() {
   const [joueurs, setJoueurs] = useState(joueursInitiaux || [])
   const [estPret, setEstPret] = useState(false)
 
-  // Rediriger vers l'accueil si on arrive ici sans données (ex: refresh)
   useEffect(() => {
     if (!code) navigate('/', { replace: true })
   }, [code, navigate])
 
   useEffect(() => {
-    // Recevoir les mises à jour de la liste de joueurs
     socket.on('liste-joueurs', (liste) => {
       setJoueurs(liste)
     })
 
-    // L'hôte a lancé la session → tout le monde va à la page vidéo
     socket.on('session-lancee', () => {
       navigate('/video', { state: { code, nom, isHote } })
     })

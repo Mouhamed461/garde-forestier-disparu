@@ -1,0 +1,83 @@
+/* ─── Conteneur principal ─────────────────────────────────────────── */
+.jauge-energie {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ─── Label ───────────────────────────────────────────────────────── */
+.jauge-label {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.22em;
+  color: #A1C0C077;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Rangée de blocs ─────────────────────────────────────────────── */
+.jauge-blocs {
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Bloc individuel ─────────────────────────────────────────────── */
+.jauge-bloc {
+  border-radius: 3px;
+  background: #ffffff0d;
+  border: 1px solid #ffffff14;
+  transition: background 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease;
+}
+
+.jauge-bloc.allume {
+  background: var(--seg-color, #27ae60);
+  border-color: transparent;
+  box-shadow:
+    0 0 5px  var(--seg-color, #27ae60),
+    0 0 10px var(--seg-color, #27ae60)55;
+}
+
+/* Pulsation quand énergie critique (<30%) */
+.jauge-bloc.critique {
+  animation: bloc-critique 1.1s ease-in-out infinite;
+}
+
+@keyframes bloc-critique {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 5px var(--seg-color), 0 0 10px var(--seg-color)55;
+  }
+  50% {
+    opacity: 0.45;
+    box-shadow: 0 0 12px var(--seg-color), 0 0 20px var(--seg-color)88;
+  }
+}
+
+/* ─── Valeur numérique ────────────────────────────────────────────── */
+.jauge-val {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  transition: color 0.4s ease;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   TAILLES
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─── sm — en-tête iPad ───────────────────────────────────────────── */
+.jauge-sm .jauge-blocs { gap: 2px; }
+.jauge-sm .jauge-bloc  { width: 6px; height: 14px; border-radius: 2px; }
+.jauge-sm .jauge-label { font-size: 0.58rem; }
+.jauge-sm .jauge-val   { font-size: 0.68rem; min-width: 28px; }
+
+/* ─── md — overlay résultat iPad ─────────────────────────────────── */
+.jauge-md .jauge-blocs { gap: 3px; }
+.jauge-md .jauge-bloc  { width: 10px; height: 22px; border-radius: 2px; }
+.jauge-md .jauge-label { font-size: 0.65rem; }
+.jauge-md .jauge-val   { font-size: 0.8rem; min-width: 32px; }
+
+/* ─── lg — overlay résultat TV ───────────────────────────────────── */
+.jauge-lg .jauge-blocs { gap: 4px; }
+.jauge-lg .jauge-bloc  { width: 18px; height: 44px; border-radius: 4px; }
+.jauge-lg .jauge-label { font-size: 0.72rem; }
+.jauge-lg .jauge-val   { font-size: 1rem; min-width: 42px; }

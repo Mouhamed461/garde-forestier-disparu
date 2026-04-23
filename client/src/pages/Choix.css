@@ -34,8 +34,38 @@
   color: #A1C0C0;
 }
 
-.choix-seq {
-  font-size: 0.78rem;
+/* ─── Centre de l'en-tête (séquence + jauge) ────────────────────── */
+.choix-entete-centre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.choix-seq-prog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.choix-seq-prog-fond {
+  width: 56px;
+  height: 2px;
+  background: #ffffff18;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.choix-seq-prog-fill {
+  height: 100%;
+  background: #7D9C80;
+  border-radius: 1px;
+  transition: width 0.8s ease;
+}
+
+.choix-seq-num {
+  font-size: 0.68rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #7D9C80;
@@ -46,6 +76,31 @@
   font-size: 1rem;
   letter-spacing: 0.08em;
   transition: color 0.5s;
+}
+
+/* ─── Bouton quitter ────────────────────────────────────────────── */
+.btn-quitter {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-quitter:active {
+  opacity: 1;
+}
+
+.btn-quitter-icone {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: invert(1);
 }
 
 /* ─── Écran d'attente (vidéo en cours) ─────────────────────────── */
@@ -60,10 +115,14 @@
 }
 
 .attente-icone {
-  font-size: 3.5rem;
-  color: #CB592E;
   opacity: 0.45;
   animation: respiration 3s ease-in-out infinite;
+}
+
+.attente-icone-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
 }
 
 @keyframes respiration {
@@ -100,12 +159,26 @@
   overflow: hidden;
 }
 
+/* ─── Invite "CHOISISSEZ !" ─────────────────────────────────────── */
+.vote-invite {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  color: #D1F3F5;
+  margin: 0;
+  text-align: center;
+  flex-shrink: 0;
+  animation: entree-vote 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+             clignotement 2.2s ease-in-out 0.5s infinite;
+}
+
 /* Timer + compteur de votes */
 .vote-header {
   display: flex;
   align-items: center;
   gap: 18px;
   flex-shrink: 0;
+  animation: entree-vote 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .vote-cercle {
@@ -182,8 +255,10 @@
 }
 
 .hote-play-icone {
-  font-size: 2.4rem;
-  line-height: 1;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  transition: opacity 0.2s;
 }
 
 .hote-play-label {
@@ -191,6 +266,47 @@
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   color: #A1C0C0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   KEYFRAMES — Animations boutons de vote
+   ══════════════════════════════════════════════════════════════════ */
+
+@keyframes entree-vote {
+  0%   { opacity: 0; transform: scale(0.4) translateY(70px); }
+  65%  { transform: scale(1.08) translateY(-6px); }
+  82%  { transform: scale(0.97) translateY(2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes shimmer-vote {
+  0%   { left: -80%; }
+  40%  { left: 120%; }
+  100% { left: 120%; }
+}
+
+@keyframes lueur-urgence {
+  0%, 100% {
+    box-shadow: 0 4px 20px #00000055, 0 0  8px var(--couleur)44;
+  }
+  50% {
+    box-shadow: 0 4px 20px #00000055, 0 0 28px var(--couleur)cc,
+                inset 0 0 14px var(--couleur)33;
+  }
+}
+
+@keyframes secousse-urgence {
+  0%, 100% { transform: translateX(0)   rotate(0deg);    }
+  20%       { transform: translateX(-6px) rotate(-1.5deg); }
+  40%       { transform: translateX(6px)  rotate(1.5deg);  }
+  60%       { transform: translateX(-4px) rotate(-0.8deg); }
+  80%       { transform: translateX(4px)  rotate(0.8deg);  }
+}
+
+@keyframes entree-timer {
+  0%   { opacity: 0; transform: scale(0) rotate(-180deg); }
+  70%  { transform: scale(1.15) rotate(8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 
 /* ─── Bouton de vote ────────────────────────────────────────────── */
@@ -201,7 +317,6 @@
   border-radius: 8px;
   background: var(--couleur, #384F54);
   cursor: pointer;
-  opacity: 0.9;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -211,34 +326,70 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 20px #00000055;
-  transition: transform 0.12s, opacity 0.2s, box-shadow 0.2s;
   -webkit-tap-highlight-color: transparent;
+
+  /* Entrée décalée par index */
+  animation: entree-vote 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)
+             calc(var(--i, 0) * 90ms) both;
 }
 
-/* Reflet interne */
+/* Balayage lumineux (shimmer) */
+.vote-btn::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -80%;
+  width: 45%;
+  height: 120%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 70%
+  );
+  transform: skewX(-20deg);
+  animation: shimmer-vote 3.5s ease-in-out
+             calc(var(--i, 0) * 400ms + 600ms) infinite;
+  pointer-events: none;
+}
+
+/* Reflet haut */
 .vote-btn::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #ffffff1a 0%, transparent 100%);
+  background: linear-gradient(180deg, #ffffff1a 0%, transparent 55%);
   pointer-events: none;
 }
 
 .vote-btn:active:not(:disabled) {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
-/* Bouton sélectionné */
+/* ─── Label du choix ────────────────────────────────────────────── */
+
+/* ─── Bouton sélectionné ────────────────────────────────────────── */
 .vote-selectionne {
   opacity: 1 !important;
-  transform: scale(1.03) !important;
-  box-shadow: 0 0 0 3px #fff, 0 6px 28px #00000088 !important;
+  transform: scale(1.04) !important;
+  box-shadow: 0 0 0 3px #fff, 0 8px 32px #00000088 !important;
+  animation: none !important;
 }
 
-/* Autres boutons estompés après vote */
+/* ─── Autres boutons estompés ───────────────────────────────────── */
 .vote-estompe {
-  opacity: 0.18 !important;
+  opacity: 0.15 !important;
   pointer-events: none;
+  animation: none !important;
+}
+
+/* ─── Urgence (≤ 5 s restants) ──────────────────────────────────── */
+.vote-urgence {
+  animation:
+    lueur-urgence   0.6s ease-in-out calc(var(--i, 0) * 90ms) both,
+    lueur-urgence   0.6s ease-in-out calc(var(--i, 0) * 90ms + 600ms) infinite,
+    secousse-urgence 0.35s ease-in-out
+                    calc(var(--i, 0) * 90ms + 600ms) infinite !important;
 }
 
 /* Symbole manette (○ △ □ ◇) */
@@ -336,6 +487,93 @@
   animation: clignotement 2s ease infinite;
 }
 
+/* ─── Popup de confirmation quitter ─────────────────────────────── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000000bb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: apparition 0.2s ease both;
+  backdrop-filter: blur(4px);
+}
+
+.popup-boite {
+  background: #0d1a0f;
+  border: 1px solid #384F5466;
+  border-radius: 12px;
+  padding: 32px 28px;
+  max-width: 320px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 8px 48px #000000cc;
+}
+
+.popup-titre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.2em;
+  color: #D1F3F5;
+  margin: 0;
+  text-align: center;
+}
+
+.popup-texte {
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: #7D9C80;
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.popup-btn {
+  flex: 1;
+  padding: 14px 0;
+  border-radius: 6px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.popup-btn:active { transform: scale(0.96); }
+
+.popup-annuler {
+  background: transparent;
+  border-color: #384F54;
+  color: #A1C0C0;
+}
+.popup-annuler:hover {
+  background: #384F5433;
+}
+
+.popup-confirmer {
+  background: transparent;
+  border-color: #c0392b;
+  color: #c0392b;
+}
+.popup-confirmer:hover {
+  background: #c0392b;
+  color: #fff;
+  box-shadow: 0 0 20px #c0392b55;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    RESPONSIVE TABLETTE (768px – 1199px)
    Mise en page plus large : boutons en 2 colonnes, bouton hôte
@@ -365,7 +603,8 @@
   }
 
   .hote-play-icone {
-    font-size: 3rem;
+    width: 52px;
+    height: 52px;
   }
 
   .hote-play-label {
