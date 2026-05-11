@@ -10,11 +10,14 @@ function RouteVideo() {
   const location = useLocation()
   const appareil = useAppareil()
 
-  if (appareil === 'telephone' || appareil === 'tablette') {
+  if (appareil === 'manette') {
     return <Navigate to="/choix" state={location.state} replace />
   }
 
-  return <Video />
+  // partieKey force le démontage/remontage complet de Video à chaque nouvelle partie,
+  // ce qui garantit un état vidéo entièrement propre (src, currentTime, listeners).
+  const partieKey = location.state?.partieKey ?? 0
+  return <Video key={partieKey} />
 }
 
 function AppRoutes() {

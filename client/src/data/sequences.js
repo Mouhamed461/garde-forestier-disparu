@@ -5,65 +5,41 @@
 const sequences = {
 
   1: {
-    description: "Jake Carter, jeune garde stagiaire, reçoit sa première mission. Un randonneur n'est pas rentré depuis hier soir. Chaque minute compte.",
-    question: "Comment Jake doit-il commencer sa progression ?",
+    description: "",
+    question: "",
     choix: {
-      rouge: "Entrer immédiatement sans vérifier son équipement",
-      vert:  "Consulter le cahier de survie et préparer son itinéraire",
-      bleu:  "Appeler les secours avant d'entrer pour signaler sa position",
-      jaune: "Attendre le lendemain pour avoir plus de lumière",
+      rouge: "Consulter le sac de Jack",
+      vert:  "Entrer directement dans la forêt",
     },
     consequences: {
       rouge: {
-        texte: "Jake entre sans vérifier son équipement. Il devra d'abord prouver qu'il connaît les objets essentiels pour survivre.",
-        type: "malus",
-        energieDelta: 0,
-      },
-      vert: {
-        texte: "Jake consulte son cahier, identifie les objets vitaux et planifie son itinéraire. Il entre en forêt avec une vision claire.",
+        texte: "Jake prend le temps de vérifier son sac à dos, il passe en revue son matériel et consulte le cahier de survie pour ne rien oublier.",
         type: "succes",
         energieDelta: 0,
       },
-      bleu: {
-        texte: "Les secours prennent note mais ne peuvent pas intervenir sans localisation précise. Jake perd du temps précieux.",
+      vert: {
+        texte: "Pressé par l'urgence, Jake s'enfonce immédiatement dans les bois sans vérifier son paquetage, il réalise vite qu'il ne sait plus s'il a tout le nécessaire.",
         type: "malus",
-        energieDelta: -10,
-      },
-      jaune: {
-        texte: "Attendre signifie perdre des heures critiques. Le randonneur est en danger et chaque minute compte.",
-        type: "malus",
-        energieDelta: -10,
+        energieDelta: 0,
       },
     },
   },
 
   2: {
-    description: "Jake est entré en forêt sans vérifier son sac. Il doit prouver qu'il connaît les bases avant d'aller plus loin. Un mauvais choix d'équipement peut coûter une vie.",
-    question: "Quels sont les 3 objets essentiels pour survivre en forêt ?",
+    description: "",
+    question: "",
     choix: {
-      rouge: "Couteau · Briquet · GPS",
-      vert:  "Boussole · Gourde · Cahier de survie",
-      bleu:  "Radio · Couverture · Corde",
-      jaune: "Allumettes · Carte · Couteau",
+      rouge: "L'équipement est mémorisé",
+      vert:  "On continue sans s'attarder",
     },
     consequences: {
       rouge: {
-        texte: "Faux. Le GPS est peu fiable en forêt dense. Sans boussole ni cahier, Jake tourne en rond. Retour au briefing.",
-        type: "malus",
-        energieDelta: -5,
-      },
-      vert: {
-        texte: "Correct ! Boussole, gourde et cahier de survie — les 3 essentiels identifiés. Jake peut entrer en forêt.",
+        texte: "L'équipement est passé en revue. Jake entre en forêt avec une connaissance claire de son matériel.",
         type: "succes",
         energieDelta: 0,
       },
-      bleu: {
-        texte: "Utiles en campement mais insuffisants pour progresser en forêt dense. Retour au briefing.",
-        type: "malus",
-        energieDelta: -5,
-      },
-      jaune: {
-        texte: "Sans boussole ni gourde, la mission est compromise avant même de commencer. Retour au briefing.",
+      vert: {
+        texte: "Jake repart sans mémoriser tout l'équipement. Il avancera avec moins de certitudes.",
         type: "malus",
         energieDelta: -5,
       },
@@ -71,65 +47,47 @@ const sequences = {
   },
 
   3: {
-    description: "Le brouillard s'installe entre les arbres. Jake ne voit pas à dix mètres devant lui. Il doit choisir comment progresser sans se perdre.",
-    question: "Jack est dans la forêt. Comment doit-il progresser ?",
+    description: "Le brouillard s'installe entre les arbres, épais et silencieux. Jake ne distingue plus rien à dix mètres devant lui. Il lui faut impérativement trouver un moyen de maintenir le cap avant de se perdre définitivement.",
+    question: "",
     choix: {
-      rouge: "Avancer au hasard en espérant trouver",
-      vert:  "Utiliser la boussole pour maintenir le cap",
-      bleu:  "S'arrêter et attendre que le brouillard se lève",
-      jaune: "Rebrousser chemin par sécurité",
+      rouge: "Utiliser la boussole",
+      vert:  "Avancer sans boussole",
     },
     consequences: {
       rouge: {
-        texte: "Jack s'épuise en tournant en rond pendant 2 heures. Il perd de l'énergie et du temps précieux.",
-        type: "malus",
-        energieDelta: -20,
-      },
-      vert: {
-        texte: "Jack maintient son cap malgré le brouillard. Il progresse efficacement vers le randonneur.",
+        texte: "Jake sort sa boussole et maintient le cap malgré le brouillard. Il progresse efficacement vers Jack Carter.",
         type: "succes",
         energieDelta: 0,
       },
-      bleu: {
-        texte: "Jack attend que le brouillard se lève. Du temps précieux est perdu.",
+      vert: {
+        texte: "Sans boussole, Jake perd ses repères dans le brouillard et tourne en rond. Il perd du temps précieux et une partie de son énergie.",
         type: "malus",
-        energieDelta: -10,
-      },
-      jaune: {
-        texte: "Jack recule et perd du terrain. Le randonneur est toujours en danger.",
-        type: "malus",
-        energieDelta: -15,
+        energieDelta: -20,
       },
     },
   },
 
   4: {
-    description: "Une rivière gonflée barre le chemin. Le courant est violent. Les traces du randonneur s'arrêtent ici — il a traversé d'une façon ou d'une autre.",
-    question: "Comment Jake doit-il traverser ?",
+    description: "Un ravin s'ouvre en travers du chemin. La paroi descend à pic sur plusieurs mètres. Les traces de Jack s'arrêtent au bord. Il a forcément trouvé un moyen de passer.",
+    question: "Comment Jake franchit-il le ravin ?",
     choix: {
-      rouge: "Traverser en force, tenu par une corde",
-      vert:  "Longer la berge jusqu'à trouver un gué",
-      bleu:  "Construire un radeau avec des branches",
-      jaune: "Faire demi-tour et chercher un pont",
+      rouge: "Sauter en espérant être amorti par la neige",
+      vert:  "Utiliser la corde pour descendre en rappel",
+      bleu:  "Contourner par le flanc de la colline",
     },
     consequences: {
       rouge: {
-        texte: "Jake lutte contre le courant. Il passe, mais sort épuisé, trempé, une partie de son équipement emportée par l'eau.",
-        type: "malus",
-        energieDelta: -20,
+        texte: "Jake saute. La neige n'amortit pas assez. Chute violente, entorse grave. Jake ne peut pas poursuivre la mission seul. Retour au débriefing.",
+        type: "mort",
+        energieDelta: 0,
       },
       vert: {
-        texte: "Plus en aval, Jake trouve un passage à gué peu profond. Il traverse sans difficulté, sec et efficace.",
+        texte: "Jake accroche la corde à un arbre solide et descend en rappel. Il touche le fond du ravin intact, prêt à continuer.",
         type: "succes",
         energieDelta: 0,
       },
       bleu: {
-        texte: "Le radeau tient à peine. La traversée prend deux heures. Jake arrive à l'autre rive fatigué et en retard.",
-        type: "malus",
-        energieDelta: -5,
-      },
-      jaune: {
-        texte: "Le détour par le pont rallonge la route d'une heure. La nuit commence à tomber. Chaque minute perdue compte.",
+        texte: "Le contournement rallonge le trajet d'une heure. Jake arrive de l'autre côté épuisé mais entier. Chaque minute perdue compte.",
         type: "malus",
         energieDelta: -15,
       },
@@ -137,32 +95,32 @@ const sequences = {
   },
 
   5: {
-    description: "Les empreintes s'arrêtent au pied d'une paroi de granite. Jake lève les yeux — la face est raide, sans prise visible. Le randonneur est monté par ici.",
-    question: "Comment Jake doit-il progresser ?",
+    description: "Le passage du ravin est inévitable. La paroi descend à pic dans l'obscurité. Jake doit choisir comment aborder la descente.",
+    question: "Comment Jake doit-il descendre le ravin ?",
     choix: {
-      rouge: "Escalader la paroi à mains nues",
-      vert:  "Analyser les indices avec le cahier de survie",
-      bleu:  "Appeler le randonneur à voix haute",
+      rouge: "Escalader la paroi à mains nues, sans corde",
+      vert:  "Utiliser la corde pour sécuriser la descente",
+      bleu:  "Descendre dans l'obscurité sans lampe à torche",
       jaune: "Contourner par le flanc de la colline",
     },
     consequences: {
       rouge: {
-        texte: "Jake glisse à mi-hauteur et chute lourdement. Fractures, perte de connaissance. La mission s'arrête ici.",
+        texte: "Sans corde de sécurité, Jake glisse à mi-hauteur et chute lourdement. La mission s'arrête ici.",
         type: "mort",
         energieDelta: 0,
       },
       vert: {
-        texte: "Le cahier révèle un passage caché derrière un éboulis. Jake contourne par une sente invisible à l'œil nu.",
+        texte: "La corde sécurise chaque prise. Jake descend lentement mais sûrement. Il rejoint le fond du ravin intact.",
         type: "succes",
         energieDelta: 0,
       },
       bleu: {
-        texte: "Une voix faible répond au loin. Jake localise le randonneur grâce au son — mais il s'est inutilement épuisé.",
+        texte: "Sans lampe, Jake rate une prise dans le noir. Plusieurs chutes, équipement endommagé — il perd un temps précieux et 30 % d'énergie.",
         type: "malus",
-        energieDelta: -5,
+        energieDelta: -30,
       },
       jaune: {
-        texte: "Le détour est long, mais Jake rejoint le sommet sans risque. Une heure de retard, mais il arrive entier.",
+        texte: "Le détour est long mais sûr. Jake arrive de l'autre côté épuisé et en retard sur son itinéraire.",
         type: "malus",
         energieDelta: -10,
       },
@@ -170,40 +128,73 @@ const sequences = {
   },
 
   6: {
-    description: "Il est là, appuyé contre un pin, les lèvres bleues. Tibia fracturé, début d'hypothermie. Il est conscient mais ne peut pas marcher. Il reste trois heures de lumière.",
-    question: "Comment Jake doit-il le prendre en charge ?",
+    description: "En traversant la cédrière, Jake tombe face à face avec un ours. L'animal s'arrête, le fixe. Chaque geste compte.",
+    question: "Que fait Jake face à l'ours ?",
     choix: {
-      rouge: "Le porter sur l'épaule immédiatement",
-      vert:  "Confectionner une attelle et une civière",
-      bleu:  "Rester sur place et envoyer un signal",
-      jaune: "Le forcer à marcher malgré la douleur",
+      rouge: "Fuir en courant",
+      vert:  "Rester immobile et parler doucement",
+      bleu:  "Gesticuler et crier pour l'effrayer",
+      jaune: "S'allonger par terre et ne plus bouger",
     },
     consequences: {
       rouge: {
-        texte: "Sans immobilisation, le transport aggrave la fracture. Le randonneur crie de douleur à chaque pas. Jake s'épuise.",
-        type: "malus",
-        energieDelta: -20,
+        texte: "Fuir provoque l'instinct de chasse de l'ours. La poursuite est fatale. La mission s'arrête ici.",
+        type: "mort",
+        energieDelta: 0,
       },
       vert: {
-        texte: "L'attelle stabilise le membre. La civière improvisée permet un transport sûr. Le randonneur est en relative sécurité.",
+        texte: "Rester calme désarme la situation. L'ours s'éloigne lentement. Jake peut reprendre sa route.",
         type: "succes",
         energieDelta: 0,
       },
       bleu: {
-        texte: "Les secours reçoivent le signal mais mettront du temps. Le froid continue de progresser pendant l'attente.",
+        texte: "Crier agresse l'ours. Il charge brièvement avant de reculer. Jake s'en sort mais perd beaucoup d'énergie.",
         type: "malus",
-        energieDelta: -5,
+        energieDelta: -20,
       },
       jaune: {
-        texte: "Marcher sur un tibia fracturé est insupportable. Jake doit l'arrêter après cent mètres, la situation empire.",
+        texte: "S'allonger peut fonctionner pour un grizzly, pas ici. L'ours renifle Jake longuement avant de partir. Il s'en sort de justesse.",
         type: "malus",
-        energieDelta: -15,
+        energieDelta: -10,
+      },
+    },
+  },
+
+  9: {
+    description: "Avant d'entrer en forêt, prouvez que vous connaissez exactement l'équipement vital du sac de Jack.",
+    question: "Parmi ces combinaisons, laquelle contient exactement l'équipement vital de Jack Carter ?",
+    choix: {
+      rouge: "Boussole, gourde d'eau, trousse de secours, corde",
+      vert:  "Boussole, lampe à torche, bâtons de randonnée, gourde",
+      bleu:  "Gourde d'eau, trousse de secours, bâtons de randonnée, lampe à torche",
+      jaune: "Corde, bâtons de randonnée, lampe à torche, boussole",
+    },
+    consequences: {
+      rouge: {
+        texte: "Exact. Boussole, gourde d'eau, trousse de secours et corde — les quatre éléments vitaux du sac. L'équipe entre en forêt.",
+        type: "succes",
+        energieDelta: 0,
+      },
+      vert: {
+        texte: "Proche, mais la lampe à torche et les bâtons ne remplacent pas la trousse de secours ni la corde. Retour au débriefing.",
+        type: "malus",
+        energieDelta: -10,
+      },
+      bleu: {
+        texte: "Sans boussole, impossible de s'orienter en forêt dense. La trousse ne suffit pas sans navigation. Retour au débriefing.",
+        type: "malus",
+        energieDelta: -10,
+      },
+      jaune: {
+        texte: "Il manque la gourde d'eau et la trousse de secours — deux éléments vitaux pour survivre. Retour au débriefing.",
+        type: "malus",
+        energieDelta: -10,
       },
     },
   },
 
   7: {
-    description: "La station est à deux heures. Jake a le randonneur avec lui. Ses jambes tremblent, les ressources s'amenuisent. La fin est en vue, mais rien n'est encore joué.",
+    description: "La station est à deux heures. Jake a la randonneuse avec lui. Ses jambes tremblent, les ressources s'amenuisent. La fin est en vue, mais rien n'est encore joué.",
     question: "Comment Jake gère-t-il ces deux dernières heures ?",
     choix: {
       rouge: "Forcer l'allure pour arriver avant la nuit",
@@ -228,7 +219,7 @@ const sequences = {
         energieDelta: 0,
       },
       jaune: {
-        texte: "Jake abandonne l'homme blessé dans le froid. Le randonneur ne survivra pas à la nuit. Une décision que personne n'oubliera.",
+        texte: "Jake abandonne la blessée dans le froid. La randonneuse ne survivra pas à la nuit. Une décision que personne n'oubliera.",
         type: "malus",
         energieDelta: -100,
       },

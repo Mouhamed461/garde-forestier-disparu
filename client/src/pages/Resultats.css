@@ -1,4 +1,3 @@
-/* ─── Page ──────────────────────────────────────────────────────── */
 .resultats-page {
   width: 100vw;
   min-height: 100vh;
@@ -10,7 +9,6 @@
   overflow: hidden;
 }
 
-/* ─── Voile ─────────────────────────────────────────────────────── */
 .resultats-voile {
   position: absolute;
   inset: 0;
@@ -23,7 +21,6 @@
   z-index: 1;
 }
 
-/* ─── Contenu central ───────────────────────────────────────────── */
 .resultats-contenu {
   position: relative;
   z-index: 2;
@@ -35,7 +32,6 @@
   max-width: 560px;
   width: 100%;
   text-align: center;
-  animation: apparition-resultats 1s ease both;
 }
 
 @keyframes apparition-resultats {
@@ -43,7 +39,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Tag de jeu ────────────────────────────────────────────────── */
 .fin-tag {
   font-size: 0.65rem;
   letter-spacing: 0.32em;
@@ -52,11 +47,17 @@
   margin: 0 0 8px;
 }
 
-/* ─── Badge icône ───────────────────────────────────────────────── */
+.fin-equipe {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
 .fin-badge {
   filter: drop-shadow(0 0 40px var(--lueur, rgba(39,174,96,0.4)));
-  animation: badge-entree 0.7s cubic-bezier(.34, 1.56, .64, 1) both;
-  animation-delay: 0.15s;
 }
 
 @keyframes badge-entree {
@@ -70,7 +71,6 @@
   display: block;
 }
 
-/* ─── Titres ────────────────────────────────────────────────────── */
 .fin-titre {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 4.2rem;
@@ -88,7 +88,6 @@
   margin: 0;
 }
 
-/* ─── Séparateur ────────────────────────────────────────────────── */
 .fin-separateur {
   width: 44px;
   height: 1.5px;
@@ -97,7 +96,6 @@
   margin: 2px 0;
 }
 
-/* ─── Message narratif ──────────────────────────────────────────── */
 .fin-message {
   font-size: 1rem;
   line-height: 1.85;
@@ -107,7 +105,6 @@
   letter-spacing: 0.025em;
 }
 
-/* ─── Énergie — sans rectangle ──────────────────────────────────── */
 .fin-energie {
   display: flex;
   align-items: center;
@@ -149,7 +146,6 @@
   text-align: right;
 }
 
-/* ─── Footer ────────────────────────────────────────────────────── */
 .fin-footer {
   display: flex;
   flex-direction: column;
@@ -159,7 +155,6 @@
   width: 100%;
 }
 
-/* ─── Info joueur ───────────────────────────────────────────────── */
 .fin-joueur {
   display: flex;
   align-items: center;
@@ -179,7 +174,6 @@
   opacity: 0.7;
 }
 
-/* ─── Bouton rejouer ────────────────────────────────────────────── */
 .fin-bouton {
   padding: 13px 60px;
   background: transparent;
@@ -198,47 +192,4 @@
   color: #060e07;
   box-shadow: 0 0 36px var(--lueur-fin, rgba(39,174,96,0.4));
   transform: scale(1.03);
-}
-
-/* ─── Overlay résultat dans Video.jsx ───────────────────────────── */
-.resultat-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  background: rgba(0, 0, 0, 0.6);
-  animation: apparition-resultats 0.4s ease both;
-  z-index: 10;
-}
-
-.resultat-couleur {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.8rem;
-  letter-spacing: 0.22em;
-  color: #D1F3F5;
-  padding: 10px 44px;
-  border-radius: 5px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-}
-
-.resultat-message {
-  font-size: 1rem;
-  color: #D1F3F5;
-  max-width: 480px;
-  text-align: center;
-  line-height: 1.6;
-  letter-spacing: 0.04em;
-  text-shadow: 0 1px 6px #000;
-}
-
-/* ─── Compteur de votes ─────────────────────────────────────────── */
-.votes-compteur {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1rem;
-  letter-spacing: 0.15em;
-  color: rgba(209, 243, 245, 0.65);
-  margin: 0;
 }

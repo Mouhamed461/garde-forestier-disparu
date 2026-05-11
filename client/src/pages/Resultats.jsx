@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { calculerFin } from '../scenario'
+import socket from '../socket'
+import useAppareil from '../hooks/useDevice'
 import './Resultats.css'
 
 const FINS = {
@@ -38,14 +41,41 @@ const FINS = {
   },
 }
 
+const ease = [0.22, 1, 0.36, 1]
+
+const varPage = {
+  hidden:  {},
+  visible: { transition: { staggerChildren: 0.11, delayChildren: 0.15 } },
+}
+
+const varItem = {
+  hidden:  { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease } },
+}
+
+const varBadge = {
+  hidden:  { opacity: 0, scale: 0.2, rotate: -18 },
+  visible: { opacity: 1, scale: 1,   rotate: 0,
+    transition: { type: 'spring', stiffness: 240, damping: 18, delay: 0.2 } },
+}
+
+const varBarre = {
+  hidden:  { scaleX: 0 },
+  visible: { scaleX: 1, transition: { duration: 0.55, ease, delay: 0.05 } },
+}
+
 function Resultats() {
   const { state } = useLocation()
   const navigate = useNavigate()
-  const { nom, energie = 0, finType } = state || {}
+  const { nom, energie = 0, finType, code, nomEquipe = '' } = state || {}
+  const appareil = useAppareil()
 
+  // 'echec' court-circuite calculerFin : une fin prématurée est toujours affichée
+  // comme telle, quelle que soit l'énergie restante transmise par le serveur.
   const typeFin = finType === 'echec' ? 'echec' : calculerFin(energie)
   const fin = FINS[typeFin]
 
+  // Photo de fond : victoire pour les deux fins positives, défaite sinon.
   const imageFond = (typeFin === 'heros' || typeFin === 'survivant')
     ? '/assets/photos/victoire.jpg'
     : '/assets/photos/defaite.jpg'
@@ -53,6 +83,18 @@ function Resultats() {
   useEffect(() => {
     if (!fin) navigate('/', { replace: true })
   }, [fin, navigate])
+
+  // La Console attend que la Manette déclenche le recommencer.
+  useEffect(() => {
+    function onRecommencer() { window.location.replace('/') }
+    socket.on('recommencer', onRecommencer)
+    return () => socket.off('recommencer', onRecommencer)
+  }, [])
+
+  function recommencer() {
+    socket.emit('recommencer', { code })
+    window.location.replace('/')
+  }
 
   if (!fin) return null
 
@@ -70,23 +112,48 @@ function Resultats() {
     >
       <div className="resultats-voile" />
 
-      <div className="resultats-contenu">
+      <motion.div
+        className="resultats-contenu"
+        variants={varPage}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.p className="fin-tag" variants={varItem}>
+          Jack Carter — Enquête Interactive
+        </motion.p>
 
-        <p className="fin-tag">Jack Carter — Enquête Interactive</p>
+        {nomEquipe && (
+          <motion.p className="fin-equipe" variants={varItem}>
+            {nomEquipe}
+          </motion.p>
+        )}
 
-        <div className="fin-badge" style={{ '--lueur': fin.lueur }}>
+        <motion.div className="fin-badge" style={{ '--lueur': fin.lueur }} variants={varBadge}>
           <span className="fin-badge-icone" style={{ color: fin.couleur }}>{fin.icone}</span>
-        </div>
+        </motion.div>
 
-        <h1 className="fin-titre" style={{ color: fin.couleur }}>{fin.titre}</h1>
-        <p className="fin-sous-titre">{fin.sousTitre}</p>
+        <motion.h1 className="fin-titre" style={{ color: fin.couleur }} variants={varItem}>
+          {fin.titre}
+        </motion.h1>
 
-        <div className="fin-separateur" style={{ background: fin.couleur }} />
+        <motion.p className="fin-sous-titre" variants={varItem}>
+          {fin.sousTitre}
+        </motion.p>
 
-        <p className="fin-message">{fin.message}</p>
+        <motion.div
+          className="fin-separateur"
+          style={{ background: fin.couleur, originX: 0 }}
+          variants={varBarre}
+        />
 
+        <motion.p className="fin-message" variants={varItem}>
+          {fin.message}
+        </motion.p>
+
+        {/* La jauge d'énergie est masquée pour 'echec' : l'énergie a été forcée
+            à 0 par le serveur et n'est pas représentative du parcours du groupe. */}
         {finType !== 'echec' && (
-          <div className="fin-energie">
+          <motion.div className="fin-energie" variants={varItem}>
             <span className="fin-energie-label">Énergie du groupe</span>
             <div className="fin-energie-barre-fond">
               <div
@@ -95,24 +162,27 @@ function Resultats() {
               />
             </div>
             <span className="fin-energie-chiffre" style={{ color: fin.couleur }}>{energie}%</span>
-          </div>
+          </motion.div>
         )}
 
-        <div className="fin-footer">
+        <motion.div className="fin-footer" variants={varItem}>
           <p className="fin-joueur">
             <span className="fin-joueur-point" style={{ background: fin.couleur }} />
             {nom || 'Joueur'}
           </p>
-          <button
-            className="fin-bouton"
-            style={{ '--couleur-fin': fin.couleur, '--lueur-fin': fin.lueur }}
-            onClick={() => navigate('/')}
-          >
-            REJOUER
-          </button>
-        </div>
-
-      </div>
+          {appareil === 'manette' && (
+            <motion.button
+              className="fin-bouton"
+              style={{ '--couleur-fin': fin.couleur, '--lueur-fin': fin.lueur }}
+              onClick={recommencer}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              RECOMMENCER
+            </motion.button>
+          )}
+        </motion.div>
+      </motion.div>
     </div>
   )
 }

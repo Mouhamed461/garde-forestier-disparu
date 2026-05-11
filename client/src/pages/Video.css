@@ -1,4 +1,3 @@
-/* ─── Page ──────────────────────────────────────────────────────── */
 .video-page {
   width: 100vw;
   height: 100vh;
@@ -9,7 +8,6 @@
   font-family: 'Oswald', sans-serif;
 }
 
-/* ─── Zone vidéo ────────────────────────────────────────────────── */
 .video-wrapper {
   position: relative;
   flex: 1;
@@ -34,175 +32,11 @@
   filter: blur(1px) brightness(0.6);
 }
 
-/* ─── Overlay play ──────────────────────────────────────────────── */
-.video-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #00000044;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.video-overlay:hover { background: #00000022; }
-
-.play-icone {
-  font-size: 3.5rem;
-  color: #D1F3F5;
-  background: #CB592E;
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-left: 6px;
-  box-shadow: 0 0 40px #CB592E88;
-  transition: transform 0.15s;
-}
-
-.video-overlay:hover .play-icone { transform: scale(1.1); }
-
-/* ─── Overlay choix — style Carmen Sandiego ─────────────────────── */
-.choix-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 60px;
-  padding: 0 0 50px 0;
-  animation: apparition-choix 0.5s ease both;
-  pointer-events: none;
-}
-
 @keyframes apparition-choix {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Colonnes gauche / droite ──────────────────────────────────── */
-.choix-colonne {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: all;
-}
-
-.choix-colonne.gauche { align-items: flex-start; }
-.choix-colonne.droite { align-items: flex-end; }
-
-/* ─── Rectangles de choix ───────────────────────────────────────── */
-.choix-rect {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 380px;
-  height: 68px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background: var(--couleur, #384F54);
-  opacity: 0.92;
-  backdrop-filter: blur(8px);
-  transition: transform 0.15s, opacity 0.2s, box-shadow 0.15s;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 24px #00000055;
-}
-
-.choix-rect::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #ffffff18 0%, transparent 100%);
-  pointer-events: none;
-}
-
-.choix-rect:hover:not(:disabled) {
-  opacity: 1;
-  transform: scale(1.03);
-  box-shadow: 0 6px 32px #00000077;
-}
-
-.choix-rect.selectionne {
-  opacity: 1;
-  transform: scale(1.05);
-  box-shadow: 0 0 0 3px #fff, 0 8px 32px #00000088;
-}
-
-/* Bouton gagnant — s'illumine avec sa propre couleur pendant 1.5s avant l'overlay */
-.choix-rect.gagnant {
-  background: var(--couleur) !important;
-  transform: scale(1.06) !important;
-  filter: brightness(1.25) saturate(1.4);
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.22), 0 4px 20px #00000066 !important;
-  opacity: 1 !important;
-  transition: background 0.3s, transform 0.3s, box-shadow 0.3s, filter 0.3s;
-}
-
-.choix-rect.estompe {
-  opacity: 0.2;
-  pointer-events: none;
-}
-
-.choix-rect-label {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.15rem;
-  letter-spacing: 0.18em;
-  color: #D1F3F5;
-  text-shadow: 0 1px 6px #000000aa;
-  z-index: 1;
-}
-
-/* ─── Centre — timer ────────────────────────────────────────────── */
-.choix-centre {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  pointer-events: none;
-  padding-bottom: 4px;
-}
-
-.choix-timer-cercle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #0d1a0fee;
-  border: 2px solid #CB592E;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 20px #CB592E66;
-}
-
-.choix-timer-chiffre {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.6rem;
-  color: #D1F3F5;
-  letter-spacing: 0.05em;
-}
-
-.choix-timer-barre-fond {
-  width: 120px;
-  height: 4px;
-  background: #ffffff22;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.choix-timer-barre-remplie {
-  height: 100%;
-  background: #CB592E;
-  border-radius: 2px;
-  transition: width 1s linear;
-}
-
-/* ─── Panneau bas ───────────────────────────────────────────────── */
 .video-bas {
   display: flex;
   align-items: center;
@@ -212,7 +46,6 @@
   border-top: 1px solid #384F5433;
 }
 
-/* ─── Info panneaux ─────────────────────────────────────────────── */
 .video-info {
   display: flex;
   align-items: center;
@@ -245,7 +78,6 @@
   white-space: nowrap;
 }
 
-/* ─── Contrôles ─────────────────────────────────────────────────── */
 .video-controles {
   flex: 1;
   display: flex;
@@ -262,7 +94,6 @@
   flex-shrink: 0;
 }
 
-/* ─── Barre de progression ──────────────────────────────────────── */
 .video-barre-fond {
   flex: 1;
   height: 4px;
@@ -271,9 +102,6 @@
   position: relative;
   cursor: default;
 }
-
-.video-barre-fond.cliquable { cursor: pointer; height: 6px; }
-.video-barre-fond.cliquable:hover { height: 8px; }
 
 .video-barre-remplie {
   height: 100%;
@@ -294,7 +122,6 @@
   transition: left 0.1s linear;
 }
 
-/* ─── Overlay résultat ──────────────────────────────────────────── */
 .resultat-overlay {
   position: absolute;
   inset: 0;
@@ -304,7 +131,6 @@
   justify-content: center;
   gap: 18px;
   padding: 40px;
-  animation: apparition-choix 0.45s ease both;
   z-index: 10;
 }
 .resultat-succes { background: #000000aa; }
@@ -332,14 +158,6 @@
   text-shadow: 0 1px 8px #000;
 }
 
-.resultat-fin-prematuree {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.4rem;
-  letter-spacing: 0.3em;
-  color: #c0392b;
-  text-shadow: 0 0 24px #c0392b88;
-}
-
 .resultat-malus {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.2rem;
@@ -353,51 +171,7 @@
   background: #2a000099 !important;
 }
 
-/* Boutons de navigation post-résultat */
-.resultat-btn {
-  margin-top: 12px;
-  padding: 14px 52px;
-  border-radius: 4px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.2rem;
-  letter-spacing: 0.22em;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
-}
-.resultat-btn:hover {
-  transform: scale(1.05);
-}
-
-.resultat-btn-continuer {
-  background: transparent;
-  border-color: #27ae60;
-  color: #27ae60;
-  box-shadow: 0 0 0 transparent;
-}
-.resultat-btn-continuer:hover {
-  background: #27ae60;
-  color: #060e07;
-  box-shadow: 0 0 24px #27ae6066;
-}
-
-.resultat-btn-recommencer {
-  background: transparent;
-  border-color: #c0392b;
-  color: #c0392b;
-}
-.resultat-btn-recommencer:hover {
-  background: #c0392b;
-  color: #fff;
-  box-shadow: 0 0 24px #c0392b66;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   EFFETS VISUELS — ÉNERGIE DU GROUPE
-   Vignette noire + flou + teinte verte selon niveau d'énergie
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* Overlay vignette — positionné par-dessus la vidéo, sous les choix */
+/* Overlay vignette sur la vidéo, intensité selon le niveau d'énergie */
 .energie-vignette {
   position: absolute;
   inset: 0;
@@ -430,7 +204,7 @@
 /* 10-29% : vignette très forte + flou + teinte verte (infection) */
 .energie-30 .energie-vignette {
   box-shadow: inset 0 0 200px 80px #000000cc;
-  background: #00150088;   /* légère teinte verte */
+  background: #00150088;
 }
 .energie-30 .video-lecteur,
 .energie-30 .quiz-fond {
@@ -452,16 +226,6 @@
   transition: filter 1.5s ease;
 }
 
-/* ─── Layout 2 choix : boutons plus larges, centrage vertical ───── */
-.choix-deux .choix-colonne {
-  justify-content: center;
-}
-.choix-deux .choix-rect {
-  width: 420px;
-  height: 76px;
-}
-
-/* ─── Label séquence (coin haut gauche) ────────────────────────── */
 .video-sequence-label {
   position: absolute;
   top: 14px;
@@ -496,7 +260,6 @@
   text-transform: uppercase;
 }
 
-/* ─── Barre énergie HUD (coin haut droit) ───────────────────────── */
 .video-energie {
   position: absolute;
   top: 14px;
@@ -537,17 +300,6 @@
   min-width: 30px;
 }
 
-/* ─── Compteur de votes (centre bas overlay choix) ──────────────── */
-.votes-compteur {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  color: #A1C0C0aa;
-  margin: 0;
-  text-align: center;
-}
-
-/* ─── Jauge énergie dans l'overlay résultat ─────────────────────── */
 .resultat-jauge-wrap {
   animation: apparition-jauge 0.5s ease 0.25s both;
 }
@@ -557,7 +309,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Texte "Prochaine séquence" — mode diffusion ───────────────── */
 .diffusion-suite {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 0.88rem;
@@ -572,12 +323,7 @@
   50%       { opacity: 0.3; }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   MODE DIFFUSION — PC / TV (support passif)
-   Désactive toutes les interactions pour garantir une projection
-   plein écran sans interférences de la souris ou du clavier.
-   ═══════════════════════════════════════════════════════════════════ */
-
+/* Mode passif Console : désactive toutes les interactions souris/clavier */
 .mode-diffusion,
 .mode-diffusion * {
   pointer-events: none !important;
@@ -590,9 +336,101 @@
   display: none;
 }
 
-/* ─── Image fond quiz ───────────────────────────────────────────── */
 .video-cachee {
-  display: none;   /* cache la vidéo pour les séquences quiz */
+  display: none;
+}
+
+/* Titre : overlay transparent — vidéo jouée derrière */
+.titre-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #00000088 0%, transparent 55%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 2.6rem;
+  gap: 0.7rem;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.titre-chapitre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.9rem;
+  letter-spacing: 0.3em;
+  color: #D1F3F5;
+  text-transform: uppercase;
+  text-shadow: 0 2px 24px #000, 0 0 40px #D1F3F518;
+  margin: 0;
+}
+
+.titre-lire-video {
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #CB592E;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Sous-titres éléments (tutoriel Séquence 1) — centrés */
+.sous-titre {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background: #000000bb;
+  border: 1px solid #D1F3F522;
+  border-radius: 4px;
+  padding: 8px 40px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  color: #D1F3F5;
+  text-transform: uppercase;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Phase items : écran de découverte de l'équipement */
+.phase-items {
+  position: absolute;
+  inset: 0;
+  background: #060e07ee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.items-titre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  color: #CB592E;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.items-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.items-element {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+  color: #D1F3F5;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .quiz-fond {
@@ -609,16 +447,152 @@
   filter: blur(1px) brightness(0.55);
 }
 
-/* ─── Question quiz ─────────────────────────────────────────────── */
-.choix-question {
+/* Texte de mission — après la vidéo de briefing, avant les choix */
+.phase-texte {
+  position: absolute;
+  inset: 0;
+  background: #060e07ee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.texte-mission {
   font-family: 'Oswald', sans-serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  color: #D1F3F5cc;
+  font-size: 1.3rem;
+  color: #D1F3F5;
   text-align: center;
-  max-width: 200px;
-  line-height: 1.5;
-  margin: 0 0 8px;
-  text-shadow: 0 1px 8px #000a;
+  line-height: 1.9;
+  letter-spacing: 0.06em;
+  max-width: 720px;
+  text-shadow: 0 1px 8px #000;
+}
+
+/* Rappel narratif du choix précédent — overlay plein écran au début de chaque séquence */
+.recap-choix-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000000e8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 60px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.recap-choix-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.42em;
+  color: #CB592E;
   text-transform: uppercase;
+  margin: 0;
+}
+
+.recap-choix-texte {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  font-weight: 300;
+  color: #D1F3F5;
+  text-align: center;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  max-width: 680px;
+  text-shadow: 0 1px 10px #000;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Indicateur Console : vidéo chargée mais pas encore lancée */
+.alerte-video-prete {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #A1C0C077;
+  z-index: 8;
+  pointer-events: none;
+  animation: clignotement-diffusion 2.5s ease infinite;
+}
+
+/* Prompt Console : "choisissez" affiché entre fin de vidéo et mode de choix */
+.prompt-choix-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000000cc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 35;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.prompt-choix-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: 0.3em;
+  color: #CB592E;
+  text-shadow: 0 0 40px #CB592E88;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.prompt-choix-texte {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  letter-spacing: 0.2em;
+  color: #A1C0C0aa;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Quiz-connaissance : question affichée sur la Console */
+.quiz-question-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 60px;
+  z-index: 15;
+  background: #060e07cc;
+  pointer-events: none;
+}
+
+.quiz-question-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.42em;
+  color: #CB592E;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.quiz-question-texte {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.55rem;
+  color: #D1F3F5;
+  text-align: center;
+  line-height: 1.65;
+  letter-spacing: 0.04em;
+  max-width: 680px;
+  text-shadow: 0 1px 12px #000;
+  margin: 0;
 }

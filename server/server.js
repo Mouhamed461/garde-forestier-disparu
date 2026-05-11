@@ -1,169 +1,257 @@
 const express = require('express')
-const http = require('http')
+const http    = require('http')
 const { Server } = require('socket.io')
-const cors = require('cors')
+const cors    = require('cors')
 
 const app = express()
 
-// CORS ouvert pour l'iPad sur réseau local / Safari
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
+  origin:      '*',
+  methods:     ['GET', 'POST'],
   credentials: false,
 }))
 
 const serveur = http.createServer(app)
 const io = new Server(serveur, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-    credentials: false,
-  },
-  // Démarre en polling puis monte en WebSocket (correctif Safari/iOS)
+  cors:      { origin: '*', methods: ['GET', 'POST'], credentials: false },
   transports: ['polling', 'websocket'],
-  // Compatibilité Engine.IO v3 pour les anciens WebKit
-  allowEIO3: true,
+  allowEIO3:  true,
 })
 
-const sessions = {}
+// Salle unique permanente — plus de code à générer ni à saisir.
+const SALLE_CODE = 'SALLE'
+const sessions   = {}
 
-// Retourne la couleur avec le plus de votes ; en cas d'égalité, choisit au hasard.
+function shufflerCouleurs() {
+  const c = ['rouge', 'vert', 'bleu', 'jaune']
+  for (let i = c.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [c[i], c[j]] = [c[j], c[i]]
+  }
+  return c
+}
+
 function calculerMajorite(votes) {
   const compte = { rouge: 0, vert: 0, bleu: 0, jaune: 0 }
   for (const couleur of Object.values(votes)) compte[couleur]++
-  const max = Math.max(...Object.values(compte))
+  const max     = Math.max(...Object.values(compte))
   const exAequo = Object.entries(compte).filter(([, v]) => v === max)
   return exAequo[Math.floor(Math.random() * exAequo.length)][0]
 }
 
-// Génère un code de session unique à 5 lettres.
-function genererCode() {
-  const lettres = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
-  let code = ''
-  for (let i = 0; i < 5; i++) {
-    code += lettres[Math.floor(Math.random() * lettres.length)]
+function initialiserSalle(hote = null) {
+  return {
+    hote,
+    joueurs:             [],
+    energie:             100,
+    votes:               {},
+    permutationCouleurs: shufflerCouleurs(),
+    _disconnectTimer:    null,
   }
-  return sessions[code] ? genererCode() : code
 }
+
+// Créer la salle au démarrage du serveur
+sessions[SALLE_CODE] = initialiserSalle()
 
 io.on('connection', (socket) => {
   console.log('Connexion', socket.id)
 
-  // Le PC (Console) crée une session — il n'est pas ajouté aux joueurs.
-  socket.on('creer-session', (_nomSession) => {
-    const code = genererCode()
-    sessions[code] = {
-      hote:     socket.id,
-      joueurs:  [],
-      sequence: 0,
-      energie:  100,
-      votes:    {},
-    }
-    socket.join(code)
-    socket.emit('session-creee', { code })
-    console.log('Session créée', code, '— Console:', socket.id)
+  // La Console rejoint la salle automatiquement (sans saisie de code)
+  socket.on('rejoindre-console', () => {
+    sessions[SALLE_CODE].hote = socket.id
+    socket.join(SALLE_CODE)
+    socket.emit('console-prete', { code: SALLE_CODE })
+    console.log('Console rejointe → salle', SALLE_CODE)
   })
 
-  // Dès que la Manette (iPad) rejoint, la session démarre pour tout le monde.
+  // La Manette prend le contrôle : réinitialise et lance la partie
+  socket.on('prendre-controle', () => {
+    const s = sessions[SALLE_CODE]
+
+    if (s._disconnectTimer) {
+      clearTimeout(s._disconnectTimer)
+      s._disconnectTimer = null
+    }
+
+    // Nouvelle partie : réinitialiser énergie, votes et permutation
+    s.energie             = 100
+    s.votes               = {}
+    s.permutationCouleurs = shufflerCouleurs()
+    s.joueurs             = [{ id: socket.id, nom: 'Manette' }]
+
+    socket.join(SALLE_CODE)
+    io.to(SALLE_CODE).emit('session-lancee', { permutationCouleurs: s.permutationCouleurs })
+    console.log('Manette — prise de contrôle → partie lancée, salle', SALLE_CODE)
+  })
+
+  // Reconnexion silencieuse de la Manette pendant le délai de grâce
   socket.on('rejoindre-session', ({ code, nomJoueur }) => {
-    const session = sessions[code]
+    const s = sessions[SALLE_CODE]
+    if (!s) return
 
-    if (!session) {
-      socket.emit('erreur-code')
-      return
+    if (s._disconnectTimer) {
+      clearTimeout(s._disconnectTimer)
+      s._disconnectTimer = null
     }
 
-    session.joueurs.push({ id: socket.id, nom: nomJoueur })
-    socket.join(code)
-    io.to(code).emit('session-lancee')
-    console.log('Manette rejointe', nomJoueur, '→ session lancée', code)
+    const existant = s.joueurs.find(j => j.nom === (nomJoueur || 'Manette'))
+    if (existant) {
+      existant.id = socket.id
+      socket.join(SALLE_CODE)
+      console.log('Manette reconnectée → reprise silencieuse, salle', SALLE_CODE)
+    }
   })
 
-  // Synchronisation vidéo (Manette → PC)
+  // Synchronisation vidéo (Manette → Console)
   socket.on('video-jouer', ({ code, temps }) => {
-    socket.to(code).emit('video-jouer', { temps })
+    socket.to(SALLE_CODE).emit('video-jouer', { temps })
   })
-
   socket.on('video-pause', ({ code, temps }) => {
-    socket.to(code).emit('video-pause', { temps })
+    socket.to(SALLE_CODE).emit('video-pause', { temps })
   })
-
   socket.on('video-seek', ({ code, temps }) => {
-    socket.to(code).emit('video-seek', { temps })
+    socket.to(SALLE_CODE).emit('video-seek', { temps })
   })
-
-  // Fin de vidéo (PC → Manette)
+  // Fin de vidéo principale → signaler à la Manette d'afficher les choix
   socket.on('video-fin', (code) => {
-    socket.to(code).emit('afficher-choix')
-    console.log('Vidéo terminée → afficher-choix, session', code)
+    socket.to(SALLE_CODE).emit('afficher-choix')
+    console.log('Vidéo terminée → afficher-choix, salle', SALLE_CODE)
   })
 
   // Vote de la Manette
   socket.on('joueur-vote', ({ code, couleur }) => {
-    const session = sessions[code]
-    if (!session) return
-    session.votes[socket.id] = couleur
-    io.to(code).emit('vote-recu', {
-      nbVotes:   Object.keys(session.votes).length,
-      nbJoueurs: session.joueurs.length,
+    const s = sessions[SALLE_CODE]
+    if (!s) return
+    s.votes[socket.id] = couleur
+    io.to(SALLE_CODE).emit('vote-recu', {
+      nbVotes:   Object.keys(s.votes).length,
+      nbJoueurs: s.joueurs.length,
     })
   })
 
   // Calcul du résultat (déclenché par l'hôte)
   socket.on('calculer-vote', ({ code, choix }) => {
-    const session = sessions[code]
-    if (!session) return
-    const couleurMaj  = calculerMajorite(session.votes)
+    const s = sessions[SALLE_CODE]
+    if (!s) return
+    const couleurMaj  = calculerMajorite(s.votes)
     const consequence = choix[couleurMaj]
     if (!consequence) return
-    session.energie = Math.max(0, session.energie + (consequence.energie || 0))
-    session.votes   = {}
-    io.to(code).emit('aller-consequence', {
+    s.energie = Math.max(0, s.energie + (consequence.energie || 0))
+    s.votes   = {}
+    io.to(SALLE_CODE).emit('aller-consequence', {
       couleur:      couleurMaj,
-      energie:      session.energie,
+      energie:      s.energie,
       consequence:  consequence.consequence,
       nextSequence: consequence.nextSequence,
     })
-    console.log('aller-consequence →', couleurMaj, '| énergie:', session.energie)
+    console.log('aller-consequence →', couleurMaj, '| énergie:', s.energie)
   })
 
-  // La TV se (re)connecte à la room pour continuer à recevoir les événements
+  // La Console (re)joint la room après navigation interne
   socket.on('rejoindre-video', ({ code }) => {
-    if (sessions[code]) {
-      socket.join(code)
-      console.log('TV rejointe room', code, '— socket', socket.id)
-    }
+    socket.join(SALLE_CODE)
+    console.log('Console — rejoindre-video → salle', SALLE_CODE, '— socket', socket.id)
   })
 
+  // Mission lancée depuis le synopsis (n'importe quel appareil peut déclencher)
+  socket.on('lancer-mission', ({ code, nomEquipe }) => {
+    io.to(SALLE_CODE).emit('mission-lancee', { nomEquipe: nomEquipe || '' })
+    console.log('Mission lancée → salle', SALLE_CODE, '| équipe:', nomEquipe || '(sans nom)')
+  })
+
+  // La Manette envoie "Continuer" → notifie uniquement la Console
+  socket.on('continuer-sequence', ({ code }) => {
+    socket.to(SALLE_CODE).emit('continuer-sequence')
+    console.log('Continuer séquence → salle', SALLE_CODE)
+  })
+
+  // Console → Manette : animation du titre terminée, bouton lecture déverrouillé
+  socket.on('titre-fini', (code) => {
+    socket.to(SALLE_CODE).emit('titre-fini')
+    console.log('Titre terminé → Manette déverrouillée, salle', SALLE_CODE)
+  })
+
+  // Console → Manette : inventaire entièrement affiché, en attente de validation
+  socket.on('inventaire-pret', (code) => {
+    socket.to(SALLE_CODE).emit('inventaire-pret')
+    console.log('Inventaire prêt → attente validation manette, salle', SALLE_CODE)
+  })
+
+  // Manette → Console : le joueur valide l'inventaire
+  socket.on('valider-inventaire', ({ code }) => {
+    socket.to(SALLE_CODE).emit('valider-inventaire')
+    console.log('Inventaire validé → reprise, salle', SALLE_CODE)
+  })
+
+  // Manette → Console : rejouer la vidéo inventaire depuis le début
+  socket.on('rejouer-video', ({ code }) => {
+    socket.to(SALLE_CODE).emit('rejouer-video')
+    console.log('Rejouer vidéo → salle', SALLE_CODE)
+  })
+
+  // Manette → Console : passer (skip) la vidéo en cours
+  socket.on('passer-video', ({ code }) => {
+    socket.to(SALLE_CODE).emit('passer-video')
+    console.log('Passer vidéo → salle', SALLE_CODE)
+  })
+
+  // Console → Manette : la séquence suivante est sur le point d'être chargée
+  socket.on('sequence-change', ({ code, next }) => {
+    socket.to(SALLE_CODE).emit('sequence-change', { next })
+    console.log('sequence-change → séquence', next, '| salle', SALLE_CODE)
+  })
+
+  // Recommencer depuis le début sans détruire la session
+  socket.on('redemarrer', ({ code }) => {
+    const s = sessions[SALLE_CODE]
+    if (!s) return
+    s.energie = 100
+    s.votes   = {}
+    io.to(SALLE_CODE).emit('redemarrer')
+    console.log('Mission redémarrée → salle', SALLE_CODE)
+  })
+
+  // Fin de partie → retour à l'accueil simultané sur toutes les interfaces
+  socket.on('recommencer', ({ code }) => {
+    const s = sessions[SALLE_CODE]
+    if (!s) return
+    s.energie = 100
+    s.votes   = {}
+    io.to(SALLE_CODE).emit('recommencer')
+    console.log('Recommencer → retour accueil, salle', SALLE_CODE)
+  })
+
+  // Quitter : réinitialise la salle sans la détruire (permanente)
   socket.on('quitter-session', ({ code }) => {
-    const session = sessions[code]
-    console.log('quitter-session reçu, code:', code, '— session trouvée:', !!session)
-    if (!session) return
-    console.log('Émission session-terminee → room', code)
-    io.to(code).emit('session-terminee')
-    delete sessions[code]
-    console.log('Session supprimée →', code)
+    io.to(SALLE_CODE).emit('session-terminee')
+    sessions[SALLE_CODE] = initialiserSalle(sessions[SALLE_CODE].hote)
+    console.log('Session quittée → salle réinitialisée', SALLE_CODE)
   })
 
   socket.on('disconnect', () => {
     console.log('Déconnexion', socket.id)
+    const s = sessions[SALLE_CODE]
+    if (!s) return
 
-    for (const code in sessions) {
-      const session = sessions[code]
+    // Console déconnectée : conserver la session, juste libérer le slot hôte
+    if (s.hote === socket.id) {
+      s.hote = null
+      console.log('Console déconnectée → session conservée, salle', SALLE_CODE)
+      return
+    }
 
-      if (session.hote === socket.id) {
-        delete sessions[code]
-        console.log('Console déconnectée → session supprimée', code)
-        continue
-      }
-
-      const avant = session.joueurs.length
-      session.joueurs = session.joueurs.filter(j => j.id !== socket.id)
-      if (avant > session.joueurs.length && session.joueurs.length === 0) {
-        io.to(code).emit('session-terminee')
-        delete sessions[code]
-        console.log('Manette déconnectée → session-terminee + session supprimée', code)
-      }
+    // Manette déconnectée → délai de grâce 5 minutes avant réinitialisation
+    const avant = s.joueurs.length
+    s.joueurs   = s.joueurs.filter(j => j.id !== socket.id)
+    if (avant > s.joueurs.length && s.joueurs.length === 0) {
+      console.log('Manette déconnectée → délai de grâce 5 min, salle', SALLE_CODE)
+      s._disconnectTimer = setTimeout(() => {
+        const sess = sessions[SALLE_CODE]
+        if (sess && sess.joueurs.length === 0) {
+          sessions[SALLE_CODE] = initialiserSalle(sess.hote)
+          console.log('Délai de grâce écoulé → salle réinitialisée', SALLE_CODE)
+        }
+      }, 300000) // 5 minutes
     }
   })
 })

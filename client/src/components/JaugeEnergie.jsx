@@ -8,7 +8,7 @@ function JaugeEnergie({ valeur = 100, segments = 10, taille = 'md', label = fals
   const couleur  = cible >= 60 ? '#27ae60' : cible >= 30 ? '#e6b800' : '#c0392b'
   const critique = cible < 30
 
-  const prevRef    = useRef(nbAllume)
+  const prevRef = useRef(nbAllume)
   const [delays, setDelays] = useState(() => Array(segments).fill(0))
 
   useEffect(() => {
@@ -19,6 +19,9 @@ function JaugeEnergie({ valeur = 100, segments = 10, taille = 'md', label = fals
     if (next === prev) return
 
     const montee = next > prev
+
+    // Anime les blocs un par un avec 45 ms d'écart (transition CSS décalée).
+    // En montée : de gauche à droite ; en descente : de droite à gauche.
     const newDelays = Array.from({ length: segments }, (_, i) => {
       if (montee  && i >= prev && i < next) return (i - prev)       * 45
       if (!montee && i >= next && i < prev) return (prev - 1 - i)   * 45
